@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gprdock: dock com widgets vivos para o GNOME</title>
+<meta name="description" content="Dock flutuante para o GNOME Shell com apps fixados, perfis e widgets vivos. Crie e compartilhe os seus.">
+<style>
+  :root {
+    --bg: #0c0d11; --panel: #15171d; --line: #252833; --text: #ecedf2;
+    --dim: #9a9fb0; --accent: #ffb454; --accent-ink: #1d1203;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Ubuntu, sans-serif; }
+  a { color: var(--accent); }
+  code { font-family: ui-monospace, "JetBrains Mono", Menlo, monospace; font-size: .92em; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+  header.hero { position: relative; overflow: hidden; padding: 96px 0 0;
+    background:
+      radial-gradient(900px 480px at 78% 8%, rgba(255,180,84,.20), transparent 62%),
+      radial-gradient(760px 520px at 12% 30%, rgba(124,108,255,.22), transparent 64%),
+      linear-gradient(180deg, #14131c 0%, #0c0d11 100%); }
+  h1 { font-size: clamp(42px, 7vw, 78px); line-height: 1.02; margin: 0 0 14px; letter-spacing: -0.02em; }
+  .lead { font-size: clamp(18px, 2.2vw, 22px); max-width: 640px; margin: 0 0 26px; color: #dcdfe8; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .button { display: inline-block; padding: 12px 20px; border-radius: 12px; font-weight: 600;
+            text-decoration: none; border: 1px solid transparent; }
+  .button.primary { background: var(--accent); color: var(--accent-ink); }
+  .button.ghost { border-color: rgba(255,255,255,.24); color: var(--text); }
+
+  /* O dock, montado com as prévias reais dos widgets. */
+  .dock-area { margin-top: 64px; padding: 0 12px 44px; overflow-x: auto; scrollbar-width: none; }
+  .dock-area::-webkit-scrollbar { display: none; }
+  .dock { display: flex; align-items: center; gap: 6px; width: max-content; margin: 0 auto;
+          padding: 8px 10px; border-radius: 22px; background: rgba(24,25,32,.86);
+          border: 1px solid rgba(255,255,255,.10);
+          box-shadow: 0 24px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06); }
+  .dock img { display: block; height: 68px; width: auto; border-radius: 14px; }
+  .dock .app { width: 56px; height: 56px; border-radius: 15px; margin: 0 3px; flex: none;
+               display: grid; place-items: center; font-size: 28px; }
+  .dock .sep { width: 1px; height: 40px; background: rgba(255,255,255,.14); margin: 0 6px; flex: none; }
+
+  section { padding: 76px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: clamp(26px, 3.4vw, 36px); margin: 0 0 10px; letter-spacing: -0.01em; }
+  .sub { color: var(--dim); max-width: 660px; margin: 0 0 34px; }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+  .card h3 { margin: 0 0 6px; font-size: 18px; }
+  .card p { margin: 0; color: var(--dim); font-size: 15.5px; }
+
+  .widgets { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .widget { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .shot { background: #2c2c2c; display: grid; place-items: center; height: 104px; padding: 0 10px; }
+  .shot img { max-width: 100%; height: auto; display: block; }
+  .widget figcaption { padding: 12px 16px 14px; }
+  .widget b { display: block; }
+  .widget span { color: var(--dim); font-size: 14.5px; }
+
+  pre { position: relative; background: #08090c; border: 1px solid var(--line); border-radius: 14px;
+        padding: 18px 20px; overflow-x: auto; font: 14.5px/1.6 ui-monospace, "JetBrains Mono", Menlo, monospace;
+        color: #ffe2b8; margin: 0 0 14px; }
+  .copy { position: absolute; top: 10px; right: 10px; font: inherit; font-size: 13px; cursor: pointer;
+          background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 5px 10px; }
+  .two { display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); align-items: start; }
+  .two > * { min-width: 0; }
+  .note { color: var(--dim); font-size: 15px; }
+  footer { border-top: 1px solid var(--line); padding: 34px 0 48px; color: var(--dim); font-size: 15px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>gprdock</h1>
+    <p class="lead">Um dock flutuante para o GNOME, com seus apps e widgets vivos: música,
+      agenda, Git, Docker, foco e os que você mesmo criar.</p>
+    <div class="actions">
+      <a class="button primary" href="#instalar">Instalar no Ubuntu</a>
+      <a class="button ghost" href="https://github.com/gustavoreimche/gprdock">Código no GitHub</a>
+    </div>
+  </div>
+  <div class="dock-area" aria-hidden="true">
+    <div class="dock">
+        <span class="app" style="background:#3b6fd8">📁</span>
+        <span class="app" style="background:#2a2d37">🌐</span>
+        <span class="app" style="background:#2f7d4f">💬</span>
+        <span class="sep"></span>
+        <img alt="" src="previews/music-wide.png">
+        <img alt="" src="previews/calendar-square.png">
+        <img alt="" src="previews/clock-square.png">
+        <img alt="" src="previews/battery-square.png">
+        <img alt="" src="previews/activity-wide.png">
+        <img alt="" src="previews/pomodoro-wide.png">
+        <img alt="" src="previews/git-wide.png">
+        <img alt="" src="previews/mascot-wide.png">
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Mais que uma barra de ícones</h2>
+    <p class="sub">O que você olharia em outro app aparece no dock, e o que precisa de um clique
+      fica a um clique.</p>
+    <div class="grid">
+      <div class="card"><h3>Widgets vivos</h3><p>Mais de 40, em forma quadrada ou retangular. O clique abre um painel com os detalhes e as ações.</p></div>
+      <div class="card"><h3>Perfis</h3><p>Um conjunto de apps e widgets para cada contexto. Troque arrastando, pela roda do mouse, por horário ou pela rede em que você está.</p></div>
+      <div class="card"><h3>Temas</h3><p>Vidro com desfoque, papel claro e neon. Cada perfil pode ter o seu.</p></div>
+      <div class="card"><h3>Janelas à vista</h3><p>Prévia das janelas ao parar o cursor, contador de notificações e indicador de apps abertos.</p></div>
+      <div class="card"><h3>Em todos os monitores</h3><p>Um dock em cada tela, se você quiser, com ocultar automático.</p></div>
+      <div class="card"><h3>Widgets seus</h3><p>Um script de poucas linhas vira um widget. Exporte para um arquivo e compartilhe.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="widgets">
+  <div class="wrap">
+    <h2>Widgets</h2>
+    <p class="sub">As imagens são do próprio dock.</p>
+    <div class="widgets">
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/music-wide.png"></div><figcaption><b>Música</b><span>O que está tocando, com os controles. Qualquer player.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/calendar-wide.png"></div><figcaption><b>Calendário</b><span>A data de hoje; o clique abre o calendário.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/clock-wide.png"></div><figcaption><b>Relógio</b><span>A hora, com o dia no retângulo.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/worldclock-wide.png"></div><figcaption><b>Relógio mundial</b><span>A hora em outras cidades, com a diferença para a sua.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/battery-wide.png"></div><figcaption><b>Bateria</b><span>A carga e quanto tempo ela ainda dá.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/storage-wide.png"></div><figcaption><b>Armazenamento</b><span>Quanto do disco já foi; no painel, cada disco.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/activity-wide.png"></div><figcaption><b>Atividade</b><span>Processador e memória em uso, ao vivo.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/network-wide.png"></div><figcaption><b>Rede</b><span>O que está descendo e subindo agora.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/pomodoro-wide.png"></div><figcaption><b>Pomodoro</b><span>Foco, pausa curta e pausa longa, com os ciclos do dia.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/timer-wide.png"></div><figcaption><b>Timer</b><span>Contagem regressiva com anel de progresso.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/stopwatch-wide.png"></div><figcaption><b>Cronômetro</b><span>Conta para cima; clique inicia e pausa.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/countdown-wide.png"></div><figcaption><b>Contagem regressiva</b><span>Quantos dias faltam para a data que importa.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/timeprogress-wide.png"></div><figcaption><b>Progresso do tempo</b><span>Quanto do dia, da semana, do mês e do ano já foi.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/water-wide.png"></div><figcaption><b>Beber água</b><span>Um copo por clique, até a meta do dia.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/note-wide.png"></div><figcaption><b>Nota</b><span>Um recado que fica no dock.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/verse-wide.png"></div><figcaption><b>Versículo do dia</b><span>O versículo do dia na NVI; o clique mostra inteiro.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/clipboard-wide.png"></div><figcaption><b>Área de transferência</b><span>O histórico do que você copiou; clique copia de novo.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/emoji-wide.png"></div><figcaption><b>Emoji</b><span>Os que você mais usa, a um clique.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/colorpicker-wide.png"></div><figcaption><b>Conta-gotas</b><span>Pega qualquer cor da tela e copia o código.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/screenshots-wide.png"></div><figcaption><b>Capturas de tela</b><span>As últimas capturas, para abrir direto.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/bookmarks-wide.png"></div><figcaption><b>Favoritos</b><span>Os sites que você abre todo dia, um clique cada.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/shortcuts-wide.png"></div><figcaption><b>Atalhos</b><span>Roda um comando ou script seu com um clique.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/collection-wide.png"></div><figcaption><b>Coleção de apps</b><span>Um ícone que guarda um grupo de apps.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/reminders-wide.png"></div><figcaption><b>Lembretes</b><span>Uma lista curta do que não esquecer; clique conclui.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/converter-wide.png"></div><figcaption><b>Conversor</b><span>Comprimento, peso, temperatura e dados.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/shelf-wide.png"></div><figcaption><b>Prateleira</b><span>Guarda arquivos arrastados de qualquer app para usar depois.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/meeting-wide.png"></div><figcaption><b>Próxima reunião</b><span>O próximo compromisso da agenda e quanto falta para ele.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/focus-wide.png"></div><figcaption><b>Não perturbe</b><span>Um clique silencia as notificações; pode iniciar o pomodoro junto.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/toggles-wide.png"></div><figcaption><b>Atalhos do sistema</b><span>Estilo escuro, luz noturna, Wi-Fi, Bluetooth e manter acordado.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/voicememo-wide.png"></div><figcaption><b>Gravador de voz</b><span>Um clique grava o microfone; outro para e guarda.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/audio-wide.png"></div><figcaption><b>Saída de som</b><span>Troca entre caixa, fone e HDMI; mostra o volume.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/mic-wide.png"></div><figcaption><b>Microfone</b><span>Um clique liga e desliga o microfone.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/vpn-wide.png"></div><figcaption><b>VPN</b><span>Netskope (com o prazo do novo login), Tailscale (com as máquinas da rede) e outras.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/ports-wide.png"></div><figcaption><b>Portas em uso</b><span>Seus servidores locais: abrir no navegador ou encerrar.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/docker-wide.png"></div><figcaption><b>Docker</b><span>Contêineres rodando; iniciar, parar e reiniciar pelo painel.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/git-wide.png"></div><figcaption><b>GitHub e GitLab</b><span>Revisões pendentes, seus PRs/MRs abertos e seus pipelines, de várias contas.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/claudecode-wide.png"></div><figcaption><b>Claude Code</b><span>Sessões do Claude Code no terminal: trabalhando ou esperando por você.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/claude-wide.png"></div><figcaption><b>Uso do Claude</b><span>Quanto do plano já foi e quando zera.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/jarvis-wide.png"></div><figcaption><b>Jarvis</b><span>Estado do assistente; clique faz ouvir.</span></figcaption></figure>
+      <figure class="widget"><div class="shot"><img loading="lazy" alt="" src="previews/mascot-wide.png"></div><figcaption><b>Mascote</b><span>Gato, cachorro, coelho ou passarinho: segue o cursor, dorme, sua, faz festa e passeia pelo dock.</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="criar">
+  <div class="wrap two">
+    <div>
+      <h2>Crie o seu widget</h2>
+      <p class="sub">Uma pasta com um <code>manifest.json</code> e um script em qualquer linguagem.
+        O que o script escreve aparece no dock.</p>
+      <p class="note">Nas Configurações › Widgets › <b>Widgets personalizados</b>: criar a partir de
+        um modelo, exportar um arquivo <code>.gprwidget</code> e instalar o de outra pessoa. Ao
+        salvar o script, o dock recarrega o widget sozinho.</p>
+      <p><a href="https://github.com/gustavoreimche/gprdock/blob/main/docs/widgets-personalizados.md">Ler o guia completo</a></p>
+    </div>
+    <div>
+      <pre><code>#!/bin/bash
+# widget.sh: roda a cada "interval" segundos
+valor=$(curl -fsS https://economia.awesomeapi.com.br/json/last/USD-BRL \
+        | jq -r '.USDBRL.bid')
+printf 'R$ %.2f\n' "$valor"     # o valor em destaque
+echo "Dólar comercial"          # a legenda
+echo "Atualizado às $(date +%H:%M)"  # o painel do clique</code></pre>
+      <p class="note">Precisa de mais? Escreva um JSON para ter anel de progresso, alerta e linhas
+        clicáveis, ou um módulo JavaScript com a mesma API dos widgets que vêm no dock.</p>
+    </div>
+  </div>
+</section>
+
+<section id="instalar">
+  <div class="wrap">
+    <h2>Instalar</h2>
+    <p class="sub">Para Ubuntu com GNOME Shell 50 (Wayland). As atualizações chegam junto com as do
+      sistema.</p>
+    <pre><button class="copy" type="button">Copiar</button><code>curl -fsSL https://gustavoreimche.github.io/gprdock/gprdock.gpg | sudo tee /usr/share/keyrings/gprdock.gpg > /dev/null
+echo "deb [signed-by=/usr/share/keyrings/gprdock.gpg] https://gustavoreimche.github.io/gprdock stable main" | sudo tee /etc/apt/sources.list.d/gprdock.list
+sudo apt update && sudo apt install gprdock</code></pre>
+    <p class="note">Depois saia e entre na sessão e ative a extensão:</p>
+    <pre><button class="copy" type="button">Copiar</button><code>gnome-extensions enable gprdock@gpr</code></pre>
+    <p class="note">Prefere o arquivo? O <code>.deb</code> de cada versão está em
+      <a href="https://github.com/gustavoreimche/gprdock/releases">Releases</a>.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>gprdock · software livre, GPL-3.0</span>
+    <span>Combina com o <a href="https://gustavoreimche.github.io/gprengine-gnome/">GprEngine</a>, wallpapers vivos para o GNOME.</span>
+  </div>
+</footer>
+
+<script>
+for (const button of document.querySelectorAll('.copy')) {
+    button.addEventListener('click', async () => {
+        await navigator.clipboard.writeText(button.parentElement.querySelector('code').textContent);
+        button.textContent = 'Copiado';
+        setTimeout(() => (button.textContent = 'Copiar'), 1600);
+    });
+}
+</script>
+</body>
+</html>
