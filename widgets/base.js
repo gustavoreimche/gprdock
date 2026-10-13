@@ -6,11 +6,17 @@ import Shell from 'gi://Shell';
 import Soup from 'gi://Soup';
 import St from 'gi://St';
 
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
 import {Ring} from './gauges.js';
 import {registerClass} from '../registerClass.js';
 
+// Navegadores que aceitam "--new-window <endereço>".
+const NEW_WINDOW_BROWSERS = /chrom|brave|edge|vivaldi|opera|firefox|librewolf|zen/i;
+// ms entre dar o foco à janela do navegador e entregar o endereço a ele: o
+// tempo de o navegador saber que aquela é a janela em uso.
+const BROWSER_FOCUS_TIME = 200;
 const HOVER_LIFT = 2;           // px lógicos que o widget sobe com o cursor
 const HOVER_TIME = 140;
 const VALUE_TIME = 240;         // ms da troca de um valor no tile
@@ -399,8 +405,52 @@ class Widget extends St.Button {
         }
     }
 
+    // Abre um endereço. Os da web vão para o navegador que já está aberto
+    // neste perfil (nesta área de trabalho), numa aba nova; janela nova só
+    // se aqui não houver nenhuma.
+    //
+    // O navegador põe a aba na janela que esteve em foco por último, que
+    // pode ser de outra área de trabalho, ou de outro usuário do navegador,
+    // sem o login que o endereço pede. Por isso a janela daqui ganha o foco
+    // antes de o endereço ser entregue.
     openUri(uri) {
-        Gio.AppInfo.launch_default_for_uri(uri, global.create_app_launch_context(0, -1));
+        const context = global.create_app_launch_context(0, -1);
+        const browser = /^https?:/i.test(uri) ? Gio.AppInfo.get_default_for_uri_scheme('https') : null;
+        const app = browser ? Shell.AppSystem.get_default().lookup_app(browser.get_id()) : null;
+        const windows = (app?.get_windows() ?? []).filter(w => !w.skip_taskbar);
+        if (windows.length === 0) {
+            Gio.AppInfo.launch_default_for_uri(uri, context);
+            return true;
+        }
+
+        const workspace = global.workspace_manager.get_active_workspace();
+        const [here] = windows.filter(w => w.located_on_workspace(workspace))
+            .sort((a, b) => b.get_user_time() - a.get_user_time());
+        if (!here) {
+            // Aberto só em outros perfis: janela nova aqui, se o navegador
+            // souber abrir uma com o endereço.
+            const command = browser.get_commandline() ?? '';
+            if (NEW_WINDOW_BROWSERS.test(browser.get_id()) && /%[uU]/.test(command)) {
+                Gio.AppInfo.create_from_commandline(
+                    command.replace(/%[uU]/, `--new-window ${GLib.shell_quote(uri)}`),
+                    browser.get_name(), Gio.AppInfoCreateFlags.NONE).launch([], context);
+            } else {
+                Gio.AppInfo.launch_default_for_uri(uri, context);
+            }
+            return true;
+        }
+
+        Main.activateWindow(here);
+        const id = GLib.timeout_add(GLib.PRIORITY_DEFAULT, BROWSER_FOCUS_TIME, () => {
+            this._timers.delete(id);
+            try {
+                Gio.AppInfo.launch_default_for_uri(uri, context);
+            } catch (e) {
+                console.warn(`gprdock: não abriu ${uri}`, e);
+            }
+            return GLib.SOURCE_REMOVE;
+        });
+        this._timers.add(id);
         return true;
     }
 

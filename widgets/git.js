@@ -210,17 +210,19 @@ class GitWidget extends Widget {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/vnd.github+json',
         };
-        const search = async query => {
+        // 'url' é a página do site com a lista inteira.
+        const search = async (query, url) => {
             const [data] = await this._json(`${api}/search/issues?per_page=${LISTED}` +
                 `&q=${encodeURIComponent(`is:pr is:open ${query}`)}`, headers);
             return {
                 count: data.total_count ?? 0,
                 items: (data.items ?? []).map(i => ({title: i.title, url: i.html_url})),
+                url,
             };
         };
         return {
-            review: await search('review-requested:@me'),
-            mine: await search('author:@me'),
+            review: await search('review-requested:@me', `${host}/pulls/review-requested`),
+            mine: await search('author:@me', `${host}/pulls`),
             pipelines: await this._pipelines(account, api, headers),
         };
     }
@@ -241,20 +243,24 @@ class GitWidget extends Widget {
     }
 
     async _gitlab(account, token) {
-        const api = `${baseUrl(account.host, 'gitlab.com')}/api/v4`;
+        const host = baseUrl(account.host, 'gitlab.com');
+        const api = `${host}/api/v4`;
         const headers = {'PRIVATE-TOKEN': token};
-        const list = async query => {
+        // 'filter' é o da página do site com a lista inteira.
+        const list = async (query, filter) => {
             const [data, responseHeaders] = await this._json(
                 `${api}/merge_requests?state=opened&per_page=${LISTED}&${query}`, headers);
             return {
                 count: Number(responseHeaders.get_one('x-total') ?? data.length),
                 items: data.map(i => ({title: i.title, url: i.web_url})),
+                url: `${host}/dashboard/merge_requests?state=opened&${filter}`,
             };
         };
         const [user] = await this._json(`${api}/user`, headers);
+        const username = encodeURIComponent(user.username);
         return {
-            review: await list(`scope=all&reviewer_id=${user.id}`),
-            mine: await list('scope=created_by_me'),
+            review: await list(`scope=all&reviewer_id=${user.id}`, `reviewer_username=${username}`),
+            mine: await list('scope=created_by_me', `author_username=${username}`),
             pipelines: await this._pipelines(account, api, headers),
         };
     }
@@ -544,6 +550,17 @@ class GitWidget extends Widget {
             lines.push([`Para você revisar: ${result.review.count} · Seus abertos: ${result.mine.count}`]);
             for (const item of [...result.review.items, ...result.mine.items].slice(0, LISTED))
                 lines.push([item.title, 'gprdock-panel-text', () => this.openUri(item.url)]);
+            // A lista não mostra todos: o que ficou de fora abre no site.
+            const reviewShown = Math.min(result.review.items.length, LISTED);
+            const mineShown = Math.min(result.mine.items.length, LISTED - reviewShown);
+            for (const [list, shown, label] of [
+                [result.review, reviewShown, 'Ver todos para revisar'],
+                [result.mine, mineShown, 'Ver todos os seus']]) {
+                if (list.count > shown) {
+                    lines.push([`${label} (${list.count}) →`, 'gprdock-panel-text',
+                        () => this.openUri(list.url)]);
+                }
+            }
 
             if (result.pipelines === null)
                 lines.push(['Pipelines: não foi possível consultar']);
