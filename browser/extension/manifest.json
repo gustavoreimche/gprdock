@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "gprdock: links no perfil em uso",
+  "version": "1.1",
+  "description": "Um link aberto a partir de um app web (WhatsApp, Teams...) vai para a janela do navegador que está no perfil do gprdock em uso; janela nova só se ali não houver nenhuma.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvPWxHT+TxWoV6cP8UIxaeJ+HkIbAMxlOLeUcdukJ4wQYetmHu/4xzK5RPQt4Hr1tURaawAXOCL8v995pssnTrUdvXmpFacZKi3mMJ/FtZPaVsnfR8oSpOsQf64ljRaIkJWAfaaH9sU3/SNNtkiCHcQdleK4qgOPBV3exGZ3FM/aZtTL1t0e3FJqIberTZz8dan+3Cxd6zeKPsyznjhwGs7s35FoIPudXfOdj19ZcXewdYGP9XbATdGGBUDC7qLg7jY0cpS3w++F/ZinbpFxZvK4Lr9Vjqc87C0mTbl4rqSP23zhQr2uuHVYd0u8afGWDXbATwhWMvG+2YGGZ5XUYBwIDAQAB",
+  "permissions": [
+    "tabs",
+    "nativeMessaging"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

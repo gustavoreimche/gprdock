@@ -18,7 +18,7 @@ EXT="$STAGE/usr/share/gnome-shell/extensions/$UUID"
 
 mkdir -p "$EXT/schemas" "$EXT/docs" "$STAGE/DEBIAN" "$STAGE/usr/share/doc/gprdock"
 cp "$REPO"/metadata.json "$REPO"/stylesheet.css "$REPO"/*.js "$EXT/"
-cp -r "$REPO/widgets" "$REPO/icons" "$REPO/previews" "$EXT/"
+cp -r "$REPO/widgets" "$REPO/icons" "$REPO/previews" "$REPO/browser" "$EXT/"
 # O guia é aberto pelas preferências.
 cp "$REPO/docs/widgets-personalizados.md" "$EXT/docs/"
 cp "$REPO"/schemas/*.gschema.xml "$EXT/schemas/"

@@ -42,6 +42,11 @@ Dock flutuante para o GNOME Shell 50 com widgets vivos, inspirado no
   ICO), guardadas em `~/.local/share/gprdock/icons`. A biblioteca também
   busca ícones na internet (coleções de código aberto, pelo
   [Iconify](https://iconify.design/)) e baixa o que você escolher.
+- **Links no perfil em uso**: um link clicado no dock abre numa aba do
+  navegador que está no perfil (na área de trabalho) em uso; janela nova só se
+  ali não houver nenhuma. Para valer também nos links clicados dentro de apps
+  web (WhatsApp, Teams...), há uma extensão do navegador: veja
+  "Links de apps web" abaixo.
 - **Separadores**: clique direito no ícone de apps, "Adicionar separador";
   arraste para o lugar, solte fora do dock para tirar.
 - **Tela de configurações**: clique direito no ícone de apps, "Configurações…"
@@ -80,6 +85,23 @@ nova no login.
 
 Para voltar ao que era: `./uninstall.sh` (o dash-to-panel volta com as mesmas
 configurações).
+
+## Links de apps web
+
+Um link clicado dentro de um app web abre na janela do navegador usada por
+último, que pode estar em outro perfil, e o GNOME leva você para lá. O dock
+não vê esse clique; quem resolve é uma extensão do navegador que conversa com
+ele: a aba vai para a janela do navegador do perfil de onde você clicou ou,
+se lá não houver nenhuma, para uma janela nova.
+
+```bash
+./browser/install.sh   # registra a ponte entre a extensão e o dock
+```
+
+Depois, em cada usuário do navegador que tiver apps web: abra
+`chrome://extensions`, ligue o "Modo do desenvolvedor", clique em "Carregar
+sem compactação" e escolha a pasta `browser/extension` (instalado pelo APT:
+`/usr/share/gnome-shell/extensions/gprdock@gpr/browser/extension`).
 
 ## Atualizar sem sair da sessão
 

@@ -2,6 +2,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 import {AutoProfile} from './autoProfile.js';
 import {Dock} from './dock.js';
+import {LinkBridge} from './linkBridge.js';
 import {Profiles} from './profiles.js';
 import {WorkspaceSync} from './workspaces.js';
 
@@ -22,6 +23,7 @@ export class GprDock {
         this._syncDocks();
 
         this._autoProfile = new AutoProfile(this._settings, this._profiles);
+        this._links = new LinkBridge();
 
         this._settings.connectObject('changed::bind-workspaces',
             () => this._syncWorkspaceBinding(), this);
@@ -65,6 +67,8 @@ export class GprDock {
         this._workspaces = null;
         this._autoProfile?.destroy();
         this._autoProfile = null;
+        this._links?.destroy();
+        this._links = null;
         this._docks?.forEach(dock => dock.destroy());
         this._docks = [];
         this._docksKey = null;

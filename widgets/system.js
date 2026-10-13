@@ -31,6 +31,24 @@ const NETSKOPE_NPA_LOGS = ['npadebuglog.log', 'npadebuglog.1.log']
 const REAUTH_LINE = /^\[[^\]]*?(\d{4}-\d\d-\d\d) (\d\d:\d\d:\d\d)\.\d+ ([+-]\d\d:\d\d)\].*Next re-auth prompt after \[(\d+)\] seconds/;
 const REAUTH_REFRESH_MS = 2 * 60 * 1000;
 const REAUTH_WARN_MINUTES = 30;
+const WARP_STATES = {
+    Connected: 'conectado',
+    Connecting: 'conectando…',
+    Disconnected: 'desconectado',
+    Paused: 'em pausa',
+    Unregistered: 'sem cadastro',
+    RegistrationMissing: 'sem cadastro',
+};
+const WARP_MODES = {
+    'warp': 'WARP',
+    'warp+doh': 'WARP com DNS sobre HTTPS',
+    'warp+dot': 'WARP com DNS sobre TLS',
+    'doh': 'Só DNS sobre HTTPS',
+    'dot': 'Só DNS sobre TLS',
+    'proxy': 'Proxy local',
+    'tunnel_only': 'Só o túnel',
+};
+const WARP_PROTOCOLS = {masque: 'MASQUE', wireguard: 'WireGuard'};
 const TAILSCALE_ADMIN = 'https://login.tailscale.com/admin/machines';
 const SYSTEMS = {linux: 'Linux', windows: 'Windows', macOS: 'macOS', iOS: 'iOS', android: 'Android'};
 // O conserto de quando o Netskope para de autenticar: reinicia o serviço
@@ -80,7 +98,7 @@ function tailscaleMachine(node) {
     };
 }
 
-// As VPNs desta máquina e se estão de pé: Netskope, Tailscale e as do
+// As VPNs desta máquina e se estão de pé: Netskope, Cloudflare, Tailscale e as do
 // NetworkManager (OpenVPN, WireGuard...). Só aparecem as que existem. No
 // painel, cada uma abre com os detalhes e as ações dela; as máquinas da rede
 // do Tailscale vêm listadas embaixo.
@@ -192,6 +210,43 @@ class VpnWidget extends Widget {
         return link;
     }
 
+    // O cliente da Cloudflare (WARP / Zero Trust).
+    async _warp() {
+        if (!GLib.find_program_in_path('warp-cli'))
+            return null;
+        const link = {id: 'warp', name: 'Cloudflare', up: false, info: []};
+        // --accept-tos: sem ele, a primeira chamada fica esperando um "sim".
+        const warp = async (...args) => JSON.parse(await runCommand(
+            ['warp-cli', '--accept-tos', '--json', ...args], this.cancellable));
+        try {
+            const {status, reason} = await warp('status');
+            link.up = status === 'Connected';
+            link.detail = WARP_STATES[status] ?? status ?? 'desconectado';
+            if (link.up && reason && reason !== 'NetworkHealthy')
+                link.detail += ' · rede com problema';
+        } catch (e) {
+            if (isCancelled(e))
+                throw e;
+            link.detail = 'serviço parado';
+            return link;
+        }
+        // Os detalhes são um extra: sem eles, o estado aparece do mesmo jeito.
+        try {
+            const {settings} = await warp('settings');
+            link.locked = Boolean(settings?.switch_locked);
+            link.info = [
+                ['Organização', settings?.organization],
+                ['Modo', WARP_MODES[settings?.operation_mode] ?? settings?.operation_mode],
+                ['Protocolo', WARP_PROTOCOLS[settings?.warp_tunnel_protocol] ?? settings?.warp_tunnel_protocol],
+            ].filter(([, value]) => typeof value === 'string' && value)
+                .map(([label, value]) => `${label}: ${value}`);
+        } catch (e) {
+            if (isCancelled(e))
+                throw e;
+        }
+        return link;
+    }
+
     async _networkManager() {
         try {
             const output = await runCommand(
@@ -219,9 +274,9 @@ class VpnWidget extends Widget {
     // `force` relê o prazo do Netskope em vez de usar o da última leitura.
     async _fetch(force = false) {
         try {
-            const [netskope, tailscale, others] = await Promise.all(
-                [this._netskope(force), this._tailscale(), this._networkManager()]);
-            this._links = [netskope, tailscale, ...others].filter(Boolean);
+            const [netskope, warp, tailscale, others] = await Promise.all([this._netskope(force),
+                this._warp(), this._tailscale(), this._networkManager()]);
+            this._links = [netskope, warp, tailscale, ...others].filter(Boolean);
         } catch {
             return;     // cancelado ao destruir o widget
         }
@@ -300,6 +355,16 @@ class VpnWidget extends Widget {
                 ['sh', '-c', NETSKOPE_RESTART],
                 'Netskope reiniciado. O túnel leva alguns segundos para voltar.',
                 'O Netskope não foi reiniciado'));
+        } else if (link.id === 'warp') {
+            // Com o botão travado pela organização, o cliente recusa.
+            if (link.locked)
+                note(menu, 'Ligar e desligar está travado pela organização');
+            else if (link.up)
+                menu.addAction('Desconectar', () => this._run(link.id,
+                    ['warp-cli', '--accept-tos', 'disconnect'], null, 'Não foi possível desconectar'));
+            else
+                menu.addAction('Conectar', () => this._run(link.id,
+                    ['warp-cli', '--accept-tos', 'connect'], null, 'Não foi possível conectar'));
         } else if (link.id === 'tailscale') {
             const tailscale = (args, failure) =>
                 this._run(link.id, ['tailscale', ...args], null, failure);

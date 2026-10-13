@@ -16,6 +16,10 @@ const LISTED = 5;
 const ACTIVITY_WEEKS = 26;
 const EVENT_PAGES = 30;     // até 3000 eventos do GitLab, quando não há calendário
 const ACTIVITY_RETRY_SECONDS = 60;
+// Depois de uma falha passageira (sem conexão, servidor com erro), a
+// consulta se repete nestes intervalos, em segundos, antes de voltar a
+// esperar o ciclo normal.
+const RETRY_SECONDS = [10, 30, 60];
 const DAY_MS = 24 * 60 * 60 * 1000;
 // O último mapa de atividade fica guardado: ao ligar, ele aparece na hora,
 // e uma conta fora do ar (rede ou VPN ainda subindo) não o apaga.
@@ -68,7 +72,13 @@ function baseUrl(host, fallback) {
     return /^https?:\/\//.test(host) ? host : `https://${host}`;
 }
 
-class AccountError extends Error {}
+// `transient`: falha que pode passar sozinha, e vale tentar de novo logo.
+class AccountError extends Error {
+    constructor(message, transient = false) {
+        super(message);
+        this.transient = transient;
+    }
+}
 
 // Pull requests e merge requests de várias contas do GitHub e do GitLab:
 // os que esperam a sua revisão e os seus que estão abertos, mais o último
@@ -91,13 +101,14 @@ class GitWidget extends Widget {
 
         this.createPanel({wide: true});
         this._show();
+        this._retries = 0;                      // novas tentativas já feitas depois de uma falha
         this._settings.connectObject('changed::git-accounts', () => {
-            this._fetch();
+            this._refetch();
             this._fetchActivity();
         }, this);
-        this._fetch();
+        this._refetch();
         this._fetchActivity();
-        this.every(REFRESH_SECONDS, () => this._fetch());
+        this.every(REFRESH_SECONDS, () => this._refetch());
         this.every(ACTIVITY_REFRESH_SECONDS, () => this._fetchActivity());
     }
 
@@ -193,12 +204,14 @@ class GitWidget extends Widget {
         try {
             response = await httpGet(this._session, url, headers, this.cancellable);
         } catch (e) {
-            throw isCancelled(e) ? e : new AccountError('sem conexão com o servidor');
+            throw isCancelled(e) ? e : new AccountError('sem conexão com o servidor', true);
         }
         if (response.status === 401 || response.status === 403)
             throw new AccountError('token recusado');
-        if (response.status !== 200)
-            throw new AccountError(`erro HTTP ${response.status}`);
+        if (response.status !== 200) {
+            throw new AccountError(`erro HTTP ${response.status}`,
+                response.status === 429 || response.status >= 500);
+        }
         return [JSON.parse(response.text), response.headers];
     }
 
@@ -214,11 +227,21 @@ class GitWidget extends Widget {
         const search = async (query, url) => {
             const [data] = await this._json(`${api}/search/issues?per_page=${LISTED}` +
                 `&q=${encodeURIComponent(`is:pr is:open ${query}`)}`, headers);
-            return {
-                count: data.total_count ?? 0,
-                items: (data.items ?? []).map(i => ({title: i.title, url: i.html_url})),
-                url,
-            };
+            // A busca não traz a branch de destino: ela vem do PR, um a um.
+            // Sem ela (consulta que falhou), o PR aparece do mesmo jeito.
+            const items = [];
+            for (const i of data.items ?? []) {
+                let target = null;
+                try {
+                    if (i.pull_request?.url)
+                        target = (await this._json(i.pull_request.url, headers))[0].base?.ref ?? null;
+                } catch (e) {
+                    if (isCancelled(e))
+                        throw e;
+                }
+                items.push({title: i.title, url: i.html_url, target});
+            }
+            return {count: data.total_count ?? 0, items, url};
         };
         return {
             review: await search('review-requested:@me', `${host}/pulls/review-requested`),
@@ -252,7 +275,7 @@ class GitWidget extends Widget {
                 `${api}/merge_requests?state=opened&per_page=${LISTED}&${query}`, headers);
             return {
                 count: Number(responseHeaders.get_one('x-total') ?? data.length),
-                items: data.map(i => ({title: i.title, url: i.web_url})),
+                items: data.map(i => ({title: i.title, url: i.web_url, target: i.target_branch})),
                 url: `${host}/dashboard/merge_requests?state=opened&${filter}`,
             };
         };
@@ -472,7 +495,12 @@ class GitWidget extends Widget {
         } catch (e) {
             if (isCancelled(e))
                 throw e;
-            return {id, name, error: e instanceof AccountError ? e.message : 'resposta inesperada'};
+            return {
+                id,
+                name,
+                error: e instanceof AccountError ? e.message : 'resposta inesperada',
+                transient: e instanceof AccountError && e.transient,
+            };
         }
     }
 
@@ -485,11 +513,36 @@ class GitWidget extends Widget {
             const results = await Promise.all(accounts.map(a => this._fetchAccount(a)));
             if (run !== this._fetchRun)
                 return;
-            this._results = results;
+
+            // Falha passageira: a consulta se repete logo, e enquanto isso
+            // fica na tela o que já se sabia da conta. O erro só aparece se
+            // as novas tentativas também falharem.
+            const retry = results.some(r => r.transient) && this._retries < RETRY_SECONDS.length;
+            this._results = results.map(result => retry && result.transient
+                ? this._results.find(known => known.id === result.id && !known.error) ?? result
+                : result);
             this._show();
+
+            if (this._fetchRetryId) {
+                this.cancelTimer(this._fetchRetryId);
+                this._fetchRetryId = 0;
+            }
+            if (retry) {
+                this._fetchRetryId = this.every(RETRY_SECONDS[this._retries++], () => {
+                    this.cancelTimer(this._fetchRetryId);
+                    this._fetchRetryId = 0;
+                    this._fetch();
+                });
+            }
         } catch {
             // Cancelado ao destruir o widget.
         }
+    }
+
+    // Consulta de novo agora, com direito a todas as novas tentativas.
+    _refetch() {
+        this._retries = 0;
+        this._fetch();
     }
 
     _show() {
@@ -545,11 +598,13 @@ class GitWidget extends Widget {
             lines.push([result.name, 'gprdock-panel-title']);
             if (result.error) {
                 lines.push([`Não consultou: ${result.error}`]);
+                lines.push(['Tentar de novo', 'gprdock-panel-text', () => this._refetch()]);
                 continue;
             }
             lines.push([`Para você revisar: ${result.review.count} · Seus abertos: ${result.mine.count}`]);
             for (const item of [...result.review.items, ...result.mine.items].slice(0, LISTED))
-                lines.push([item.title, 'gprdock-panel-text', () => this.openUri(item.url)]);
+                lines.push([`${item.title}${item.target ? `\n→ ${item.target}` : ''}`,
+                    'gprdock-panel-text', () => this.openUri(item.url)]);
             // A lista não mostra todos: o que ficou de fora abre no site.
             const reviewShown = Math.min(result.review.items.length, LISTED);
             const mineShown = Math.min(result.mine.items.length, LISTED - reviewShown);

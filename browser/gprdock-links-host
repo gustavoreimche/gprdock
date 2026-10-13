@@ -1,0 +1,42 @@
+#!/usr/bin/python3
+"""Ponte entre a extensão do navegador (browser/extension) e o gprdock.
+
+O navegador roda este programa a cada pergunta da extensão: a mensagem chega
+pela entrada (4 bytes com o tamanho, depois JSON), é repassada ao dock pelo
+D-Bus, e a resposta volta pela saída no mesmo formato.
+"""
+import json
+import struct
+import subprocess
+import sys
+
+DESTINATION = 'org.gnome.Shell'
+PATH = '/io/github/gustavoreimche/gprdock'
+INTERFACE = 'io.github.gustavoreimche.gprdock.Links'
+
+
+def call(*arguments):
+    output = subprocess.run(
+        ['busctl', '--user', '--json=short', 'call', DESTINATION, PATH, INTERFACE, *arguments],
+        capture_output=True, text=True, timeout=5, check=True).stdout
+    return json.loads(output)['data'][0]
+
+
+def main():
+    header = sys.stdin.buffer.read(4)
+    if len(header) < 4:
+        return
+    message = json.loads(sys.stdin.buffer.read(struct.unpack('=I', header)[0]))
+    try:
+        if message.get('action') == 'settle':
+            reply = {'ok': call('Settle', 't', str(int(message.get('window', 0))))}
+        else:
+            reply = json.loads(call('Query'))
+    except Exception as error:  # o dock não está no ar: a extensão não faz nada
+        reply = {'origin': None, 'error': str(error)}
+    data = json.dumps(reply).encode()
+    sys.stdout.buffer.write(struct.pack('=I', len(data)) + data)
+    sys.stdout.buffer.flush()
+
+
+main()
