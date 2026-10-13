@@ -112,6 +112,10 @@
       <default>''</default>
       <summary>Versão do código carregado; trocada pelo reload.sh para recarregar sem sair da sessão</summary>
     </key>
+    <key name="app-icons" type="s">
+      <default>'{}'</default>
+      <summary>Ícones trocados pelo usuário, em JSON: id do app para o caminho de uma imagem ou o nome de um ícone do tema</summary>
+    </key>
     <key name="prefs-page" type="s">
       <default>''</default>
       <summary>Página em que a tela de configurações deve abrir na próxima vez</summary>

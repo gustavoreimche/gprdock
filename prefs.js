@@ -1,4 +1,5 @@
 import Adw from 'gi://Adw';
+import Gdk from 'gi://Gdk';
 import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
@@ -14,6 +15,10 @@ import {
     ARCHIVE_SUFFIX, createTemplate, customInfo, customName, exportWidget,
     inspectArchive, installArchive, listCustom, removeWidget,
 } from './custom.js';
+import {
+    customGicon, importToLibrary, isIconFile, libraryDir, listLibrary, readAppIcons,
+    removeFromLibrary, saveToLibrary, setAppIcon,
+} from './iconLibrary.js';
 import {
     THEMES, WIDGET_INFO, WIDGET_LABELS, RUNNING, appItem, widgetItem, itemApp,
     itemWidget, loadProfiles, parseProfiles, widgetBase, widgetParam, widgetSize, widgetSizes,
@@ -462,9 +467,9 @@ class ProfilesPage {
         return expander;
     }
 
-    _chooseApp(alreadyPinned, onChosen) {
+    _chooseApp(alreadyPinned, onChosen, title = 'Fixar um app') {
         const dialog = new Adw.Dialog({
-            title: 'Fixar um app',
+            title,
             content_width: 420,
             content_height: 560,
         });
@@ -1775,6 +1780,463 @@ class AccountsPage {
     }
 }
 
+// ---------- Ícones dos apps e a biblioteca de ícones ----------
+
+const ICON_PREVIEW = 48;
+// Iconify: busca em mais de duzentas coleções de ícones de código aberto.
+const ICONIFY_URL = 'https://api.iconify.design';
+const ONLINE_FETCHED = 240;     // quantos a busca pede
+const ONLINE_SHOWN = 72;        // quantos coloridos aparecem
+
+const iconGicon = icon => isIconFile(icon)
+    ? new Gio.FileIcon({file: Gio.File.new_for_path(icon)})
+    : new Gio.ThemedIcon({name: icon});
+const iconLabel = icon => isIconFile(icon) ? GLib.path_get_basename(icon) : icon;
+
+class IconsPage {
+    constructor(settings, window, chooseApp) {
+        this._settings = settings;
+        this._window = window;
+        this._chooseApp = chooseApp;
+        this._groups = [];
+        this.page = new Adw.PreferencesPage({
+            title: 'Ícones',
+            icon_name: 'applications-graphics-symbolic',
+        });
+
+        const id = this._settings.connect('changed::app-icons', () => this._rebuild());
+        window.connect('close-request', () => {
+            this._settings.disconnect(id);
+            return false;
+        });
+        this._rebuild();
+    }
+
+    _toast(text) {
+        this._window.add_toast(new Adw.Toast({title: text}));
+    }
+
+    _rebuild() {
+        this._groups.forEach(group => this.page.remove(group));
+        this._groups = [this._buildApps(), this._buildLibrary()];
+        this._groups.forEach(group => this.page.add(group));
+    }
+
+    _buildApps() {
+        const group = new Adw.PreferencesGroup({
+            title: 'Ícones dos apps',
+            description: 'O ícone que cada app mostra no dock. Também dá para trocar ' +
+                'pelo dock: clique direito no app, "Trocar ícone…"',
+        });
+        const icons = readAppIcons(this._settings);
+        for (const [appId, icon] of Object.entries(icons)) {
+            const info = GioUnix.DesktopAppInfo.new(appId);
+            const row = new Adw.ActionRow({
+                title: GLib.markup_escape_text(info?.get_name() ?? appId, -1),
+                subtitle: GLib.markup_escape_text(`${iconLabel(icon)}`, -1),
+            });
+            const image = new Gtk.Image({pixel_size: 32});
+            image.gicon = customGicon(this._settings, appId) ?? info?.get_icon() ??
+                new Gio.ThemedIcon({name: 'application-x-executable-symbolic'});
+            row.add_prefix(image);
+            row.add_suffix(iconButton('document-edit-symbolic', 'Trocar o ícone',
+                () => this.pick(appId)));
+            row.add_suffix(iconButton('edit-undo-symbolic', 'Voltar ao ícone original',
+                () => setAppIcon(this._settings, appId, null)));
+            group.add(row);
+        }
+
+        const add = new Adw.ButtonRow({
+            title: 'Trocar o ícone de um app…',
+            start_icon_name: 'list-add-symbolic',
+        });
+        add.connect('activated', () => this._chooseApp(Object.keys(icons),
+            appId => this.pick(appId), 'Trocar o ícone de qual app?'));
+        group.add(add);
+        return group;
+    }
+
+    _buildLibrary() {
+        const group = new Adw.PreferencesGroup({
+            title: 'Biblioteca',
+            description: 'As suas imagens (PNG, SVG, JPG, WebP ou ICO), prontas para ' +
+                'usar em qualquer app',
+        });
+        const buttons = new Gtk.Box({spacing: 4});
+        buttons.append(iconButton('folder-open-symbolic', 'Abrir a pasta da biblioteca', () => {
+            GLib.mkdir_with_parents(libraryDir(), 0o755);
+            Gio.AppInfo.launch_default_for_uri(GLib.filename_to_uri(libraryDir(), null), null);
+        }));
+        buttons.append(iconButton('view-refresh-symbolic', 'Ler a pasta de novo',
+            () => this._rebuild()));
+        group.set_header_suffix(buttons);
+
+        const paths = listLibrary();
+        if (paths.length > 0) {
+            const flow = new Gtk.FlowBox({
+                selection_mode: Gtk.SelectionMode.NONE,
+                homogeneous: true,
+                max_children_per_line: 12,
+                column_spacing: 4,
+                row_spacing: 4,
+                margin_top: 8,
+                margin_bottom: 8,
+                margin_start: 8,
+                margin_end: 8,
+            });
+            for (const path of paths) {
+                const overlay = new Gtk.Overlay({tooltip_text: iconLabel(path)});
+                overlay.set_child(new Gtk.Image({
+                    gicon: iconGicon(path),
+                    pixel_size: ICON_PREVIEW,
+                    margin_top: 10,
+                    margin_bottom: 10,
+                    margin_start: 10,
+                    margin_end: 10,
+                }));
+                const remove = iconButton('window-close-symbolic', 'Tirar da biblioteca', () => {
+                    removeFromLibrary(this._settings, path);
+                    this._rebuild();
+                });
+                remove.css_classes = ['circular', 'osd'];
+                remove.halign = Gtk.Align.END;
+                remove.valign = Gtk.Align.START;
+                overlay.add_overlay(remove);
+                flow.append(new Gtk.FlowBoxChild({child: overlay, focusable: false}));
+            }
+            group.add(new Gtk.Frame({child: flow, css_classes: ['card'], margin_bottom: 12}));
+        }
+
+        const add = new Adw.ButtonRow({
+            title: 'Importar imagens…',
+            start_icon_name: 'list-add-symbolic',
+        });
+        add.connect('activated', () => this._chooseImages(true, () => this._rebuild()));
+        group.add(add);
+        const online = new Adw.ButtonRow({
+            title: 'Buscar na internet…',
+            start_icon_name: 'folder-download-symbolic',
+        });
+        online.connect('activated', () => this._searchOnline('', path => {
+            this._toast(`${iconLabel(path)} entrou na biblioteca`);
+            this._rebuild();
+        }, false));
+        group.add(online);
+        return group;
+    }
+
+    _get(url, cancellable, onDone) {
+        this._session ??= new Soup.Session({timeout: 15});
+        const request = Soup.Message.new('GET', url);
+        this._session.send_and_read_async(request, GLib.PRIORITY_DEFAULT, cancellable,
+            (session, result) => {
+                let bytes = null;
+                try {
+                    bytes = session.send_and_read_finish(result);
+                    if (request.get_status() !== Soup.Status.OK)
+                        bytes = null;
+                } catch {
+                    bytes = null;
+                }
+                if (!cancellable.is_cancelled())
+                    onDone(bytes);
+            });
+    }
+
+    // Busca ícones na internet (Iconify) e guarda o escolhido na biblioteca.
+    // Só os coloridos: os de uma cor só são traços pretos, feitos para
+    // botões, e somem num dock escuro. Com closeOnPick o diálogo fecha na
+    // primeira escolha; sem, fica aberto para pegar vários.
+    _searchOnline(query, onSaved, closeOnPick = true) {
+        const dialog = new Adw.Dialog({
+            title: 'Buscar ícones na internet',
+            content_width: 560,
+            content_height: 620,
+        });
+        let cancellable = new Gio.Cancellable();
+        dialog.connect('closed', () => cancellable.cancel());
+
+        const search = new Gtk.SearchEntry({
+            placeholder_text: 'Em inglês rende mais: firefox, terminal, music…',
+            search_delay: 500,
+            margin_start: 12,
+            margin_end: 12,
+            margin_bottom: 8,
+        });
+        const status = new Adw.StatusPage({
+            icon_name: 'system-search-symbolic',
+            title: 'Busque um ícone',
+            description: 'Ícones de coleções de código aberto, pelo Iconify. ' +
+                'O que você escolher é baixado para a sua biblioteca.',
+            vexpand: true,
+        });
+        const flow = new Gtk.FlowBox({
+            selection_mode: Gtk.SelectionMode.NONE,
+            homogeneous: true,
+            max_children_per_line: 12,
+            valign: Gtk.Align.START,
+            margin_start: 6,
+            margin_end: 6,
+            margin_bottom: 6,
+        });
+        const scroll = new Gtk.ScrolledWindow({
+            child: flow,
+            vexpand: true,
+            hscrollbar_policy: Gtk.PolicyType.NEVER,
+            visible: false,
+        });
+        const show = (title, description = '') => {
+            status.title = title;
+            status.description = description;
+            status.visible = true;
+            scroll.visible = false;
+        };
+
+        const addResult = (icon, collection) => {
+            const [prefix, name] = icon.split(':');
+            const image = new Gtk.Image({
+                icon_name: 'content-loading-symbolic',
+                pixel_size: ICON_PREVIEW,
+                margin_top: 6,
+                margin_bottom: 6,
+                margin_start: 6,
+                margin_end: 6,
+            });
+            const button = new Gtk.Button({
+                child: image,
+                css_classes: ['flat'],
+                sensitive: false,
+                tooltip_text: `${name}\n${collection.name ?? prefix}` +
+                    `${collection.license?.title ? ` · ${collection.license.title}` : ''}`,
+            });
+            flow.append(new Gtk.FlowBoxChild({child: button, focusable: false}));
+            this._get(`${ICONIFY_URL}/${prefix}/${name}.svg?height=256`, cancellable, bytes => {
+                try {
+                    image.paintable = Gdk.Texture.new_from_bytes(bytes);
+                } catch {
+                    // Não veio, ou não é uma imagem: fica sem poder escolher.
+                    image.icon_name = 'image-missing-symbolic';
+                    return;
+                }
+                button.sensitive = true;
+                button.connect('clicked', () => {
+                    try {
+                        onSaved(saveToLibrary(`${prefix}-${name}.svg`, bytes.get_data()));
+                    } catch (e) {
+                        this._toast(`Não foi possível guardar o ícone: ${e.message}`);
+                        return;
+                    }
+                    if (closeOnPick)
+                        dialog.close();
+                    else
+                        button.sensitive = false;
+                });
+            });
+        };
+
+        const run = () => {
+            // A busca anterior, e os ícones que ela ainda baixava, param aqui.
+            cancellable.cancel();
+            cancellable = new Gio.Cancellable();
+            flow.remove_all();
+            const text = search.text.trim();
+            if (text.length < 2) {
+                show('Busque um ícone', 'Ícones de coleções de código aberto, pelo Iconify. ' +
+                    'O que você escolher é baixado para a sua biblioteca.');
+                return;
+            }
+            show('Buscando…');
+            const url = `${ICONIFY_URL}/search?query=${encodeURIComponent(text)}` +
+                `&limit=${ONLINE_FETCHED}`;
+            this._get(url, cancellable, bytes => {
+                let found = null;
+                try {
+                    found = JSON.parse(new TextDecoder().decode(bytes.get_data()));
+                } catch {
+                    show('A busca não respondeu', 'Confira a conexão e tente de novo.');
+                    return;
+                }
+                const collections = found.collections ?? {};
+                const icons = (found.icons ?? [])
+                    .filter(icon => collections[icon.split(':')[0]]?.palette)
+                    .slice(0, ONLINE_SHOWN);
+                if (icons.length === 0) {
+                    show('Nenhum ícone colorido com esse nome', 'Tente outro termo, em inglês.');
+                    return;
+                }
+                status.visible = false;
+                scroll.visible = true;
+                icons.forEach(icon => addResult(icon, collections[icon.split(':')[0]]));
+            });
+        };
+        search.connect('search-changed', run);
+
+        const view = new Adw.ToolbarView();
+        view.add_top_bar(new Adw.HeaderBar());
+        const box = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL});
+        box.append(search);
+        box.append(status);
+        box.append(scroll);
+        view.set_content(box);
+        dialog.set_child(view);
+        dialog.present(this._window);
+        search.text = query;
+        search.grab_focus();
+    }
+
+    // Pede imagens ao usuário, copia para a biblioteca e chama onImported
+    // com os caminhos das cópias.
+    _chooseImages(multiple, onImported) {
+        const filter = new Gtk.FileFilter({name: 'Imagens'});
+        ['png', 'svg', 'jpg', 'jpeg', 'webp', 'ico', 'bmp', 'gif'].forEach(suffix => {
+            filter.add_pattern(`*.${suffix}`);
+            filter.add_pattern(`*.${suffix.toUpperCase()}`);
+        });
+        const filters = new Gio.ListStore({item_type: Gtk.FileFilter});
+        filters.append(filter);
+        const dialog = new Gtk.FileDialog({title: 'Importar imagens', filters});
+        const finish = files => {
+            const imported = [];
+            for (const file of files) {
+                try {
+                    imported.push(importToLibrary(file.get_path()));
+                } catch (e) {
+                    this._toast(e.message);
+                }
+            }
+            if (imported.length > 0)
+                onImported(imported);
+        };
+        const dismissed = e => e.matches?.(Gtk.DialogError, Gtk.DialogError.DISMISSED);
+        if (multiple) {
+            dialog.open_multiple(this._window, null, (_dialog, result) => {
+                try {
+                    const list = dialog.open_multiple_finish(result);
+                    finish(Array.from({length: list.get_n_items()}, (_, i) => list.get_item(i)));
+                } catch (e) {
+                    if (!dismissed(e))
+                        this._toast(e.message);
+                }
+            });
+        } else {
+            dialog.open(this._window, null, (_dialog, result) => {
+                try {
+                    finish([dialog.open_finish(result)]);
+                } catch (e) {
+                    if (!dismissed(e))
+                        this._toast(e.message);
+                }
+            });
+        }
+    }
+
+    // Ícones coloridos do tema do sistema (os simbólicos são traços de uma
+    // cor só, feitos para botões).
+    _themeIcons() {
+        this._themeNames ??= Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
+            .get_icon_names()
+            .filter(name => !name.endsWith('-symbolic') && !name.endsWith('-symbolic-rtl'))
+            .sort((a, b) => a.localeCompare(b));
+        return this._themeNames;
+    }
+
+    // Escolhe o ícone de um app: os da biblioteca primeiro, depois os do
+    // tema do sistema, ou um arquivo novo (que entra na biblioteca).
+    pick(appId) {
+        const info = GioUnix.DesktopAppInfo.new(appId);
+        const dialog = new Adw.Dialog({
+            title: `Ícone de ${info?.get_name() ?? appId}`,
+            content_width: 560,
+            content_height: 620,
+        });
+        const choose = icon => {
+            setAppIcon(this._settings, appId, icon);
+            dialog.close();
+        };
+
+        const search = new Gtk.SearchEntry({
+            placeholder_text: 'Buscar na biblioteca e nos ícones do sistema',
+            margin_start: 12,
+            margin_end: 12,
+            margin_bottom: 8,
+        });
+        const filter = Gtk.CustomFilter.new(item => {
+            const query = search.text.trim().toLowerCase();
+            return query === '' || iconLabel(item.string).toLowerCase().includes(query);
+        });
+        search.connect('search-changed', () => filter.changed(Gtk.FilterChange.DIFFERENT));
+        const model = new Gtk.FilterListModel({
+            model: Gtk.StringList.new([...listLibrary(), ...this._themeIcons()]),
+            filter,
+        });
+
+        const factory = new Gtk.SignalListItemFactory();
+        factory.connect('setup', (_factory, item) => item.set_child(new Gtk.Image({
+            pixel_size: ICON_PREVIEW,
+            margin_top: 6,
+            margin_bottom: 6,
+            margin_start: 6,
+            margin_end: 6,
+        })));
+        factory.connect('bind', (_factory, item) => {
+            const icon = item.item.string;
+            item.child.gicon = iconGicon(icon);
+            item.child.tooltip_text = iconLabel(icon);
+        });
+        const grid = new Gtk.GridView({
+            model: new Gtk.NoSelection({model}),
+            factory,
+            single_click_activate: true,
+            min_columns: 4,
+            max_columns: 12,
+            margin_start: 6,
+            margin_end: 6,
+        });
+        grid.connect('activate', (_grid, position) => choose(model.get_item(position).string));
+
+        const header = new Adw.HeaderBar();
+        const file = new Gtk.Button({
+            icon_name: 'document-open-symbolic',
+            tooltip_text: 'Usar um arquivo de imagem (entra na biblioteca)',
+        });
+        file.connect('clicked', () => this._chooseImages(false, ([path]) => choose(path)));
+        header.pack_start(file);
+        const online = new Gtk.Button({
+            icon_name: 'folder-download-symbolic',
+            tooltip_text: 'Buscar um ícone na internet (entra na biblioteca)',
+        });
+        // O id do app costuma ser o nome dele em inglês (org.gnome.Nautilus);
+        // o de um app web é um código, e aí vale o nome.
+        const key = appId.replace(/\.desktop$/, '').split('.').pop();
+        const guess = /[a-z]{32}|^gprdock-web-/.test(key) ? info?.get_name() ?? '' : key;
+        online.connect('clicked', () => this._searchOnline(
+            guess.replace(/[-_]+/g, ' ').toLowerCase(), path => choose(path)));
+        header.pack_start(online);
+        if (appId in readAppIcons(this._settings)) {
+            const reset = new Gtk.Button({
+                icon_name: 'edit-undo-symbolic',
+                tooltip_text: 'Voltar ao ícone original',
+            });
+            reset.connect('clicked', () => choose(null));
+            header.pack_start(reset);
+        }
+
+        const view = new Adw.ToolbarView();
+        view.add_top_bar(header);
+        const box = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL});
+        box.append(search);
+        box.append(new Gtk.ScrolledWindow({
+            child: grid,
+            vexpand: true,
+            hscrollbar_policy: Gtk.PolicyType.NEVER,
+        }));
+        view.set_content(box);
+        dialog.set_child(view);
+        dialog.present(this._window);
+        search.grab_focus();
+    }
+}
+
 export default class GprDockPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         const settings = this.getSettings();
@@ -1789,12 +2251,41 @@ export default class GprDockPreferences extends ExtensionPreferences {
         window.add(new SettingsPage(settings).page);
         window.add(new ContentPage(settings,
             (pinned, onChosen) => profiles._chooseApp(pinned, onChosen)).page);
+        const icons = new IconsPage(settings, window,
+            (taken, onChosen, title) => profiles._chooseApp(taken, onChosen, title));
+        window.add(icons.page);
         window.add(new AccountsPage(settings).page);
 
-        // O dock pode pedir para abrir direto na galeria.
-        if (settings.get_string('prefs-page') === 'widgets') {
+        // O dock pode pedir para abrir direto na galeria, ou na troca do
+        // ícone de um app ('icon:<id do app>'); com a janela já aberta, o
+        // pedido chega pela mudança da chave.
+        const openRequested = () => {
+            const request = settings.get_string('prefs-page');
+            if (request === '')
+                return;
             settings.set_string('prefs-page', '');
-            window.set_visible_page(gallery.page);
+            if (request === 'widgets') {
+                window.set_visible_page(gallery.page);
+            } else if (request.startsWith('icon:')) {
+                window.set_visible_page(icons.page);
+                window.present();
+                icons.pick(request.slice('icon:'.length));
+            }
+        };
+        const requestId = settings.connect('changed::prefs-page', openRequested);
+        window.connect('close-request', () => {
+            settings.disconnect(requestId);
+            return false;
+        });
+        // A galeria já abre escolhida; o seletor de ícone espera a janela
+        // estar na tela.
+        if (settings.get_string('prefs-page') === 'widgets') {
+            openRequested();
+        } else {
+            GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
+                openRequested();
+                return GLib.SOURCE_REMOVE;
+            });
         }
     }
 }

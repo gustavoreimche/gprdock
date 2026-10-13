@@ -36,6 +36,12 @@ Dock flutuante para o GNOME Shell 50 com widgets vivos, inspirado no
   cada pasta `~/.claude-*` com login vira um cartão na galeria) e Jarvis.
 - **Temas**, um por perfil (Configurações › Perfis): Vidro, Papel, Neon,
   Floating, Nord, Dracula, Poente, Grafite e Menta.
+- **Ícones personalizados**: clique direito num app, "Trocar ícone…" (ou
+  Configurações › Ícones). Dá para escolher entre os ícones do tema do sistema
+  e os da sua **biblioteca**, as imagens que você importa (PNG, SVG, JPG, WebP,
+  ICO), guardadas em `~/.local/share/gprdock/icons`. A biblioteca também
+  busca ícones na internet (coleções de código aberto, pelo
+  [Iconify](https://iconify.design/)) e baixa o que você escolher.
 - **Separadores**: clique direito no ícone de apps, "Adicionar separador";
   arraste para o lugar, solte fora do dock para tirar.
 - **Tela de configurações**: clique direito no ícone de apps, "Configurações…"

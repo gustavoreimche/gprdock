@@ -278,6 +278,7 @@ export class Dock {
                 this._clearItems();
                 this._syncProfile();
             },
+            'changed::app-icons', () => this._appItems.forEach(item => item.appIcon.icon.update()),
             'changed::autohide', () => this._syncAutohide(),
             'changed::window-previews', () => this._syncExtras(),
             'changed::notification-badges', () => this._syncExtras(), this);
@@ -645,6 +646,10 @@ export class Dock {
             adoptMenu: menu => this.adoptMenu(menu),
             duplicate: target => this._duplicateWebApp(target),
             remove: target => this._removeWebAppCopy(target),
+            chooseIcon: target => {
+                this.settings.set_string('prefs-page', `icon:${target.get_id()}`);
+                this._openPreferences();
+            },
         });
         this._appItems.set(app.get_id(), item);
         item.appIcon.connect('menu-state-changed', () => {

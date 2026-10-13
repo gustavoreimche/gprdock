@@ -7,6 +7,7 @@ import * as AppDisplay from 'resource:///org/gnome/shell/ui/appDisplay.js';
 import * as DND from 'resource:///org/gnome/shell/ui/dnd.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {DashItemContainer} from 'resource:///org/gnome/shell/ui/dash.js';
+import {customGicon} from './iconLibrary.js';
 import {registerClass} from './registerClass.js';
 import {isIsolatedCopy, isSingleWindowWebApp, isWebApp} from './webApps.js';
 
@@ -31,14 +32,28 @@ class DockAppIcon extends AppDisplay.AppIcon {
         this._webApps = webApps;
     }
 
-    // O menu do GNOME, mais o que o dock oferece para apps web: uma cópia
-    // com sessão isolada (e, numa cópia, apagá-la).
+    // O ícone que o usuário escolheu para o app, se houver; senão o dele.
+    // (O GNOME pode pedir o ícone antes de o _init acima terminar.)
+    _createIcon(iconSize) {
+        const gicon = this._settings ? customGicon(this._settings, this.app.get_id()) : null;
+        if (!gicon)
+            return super._createIcon(iconSize);
+        return new St.Icon({gicon, icon_size: iconSize, fallback_gicon: this.app.get_icon()});
+    }
+
+    getDragActor() {
+        return this._createIcon(Main.overview.dash.iconSize);
+    }
+
+    // O menu do GNOME, mais o que o dock oferece: trocar o ícone e, para
+    // apps web, uma cópia com sessão isolada (e, numa cópia, apagá-la).
     popupMenu() {
         const created = !this._menu;
         const result = super.popupMenu();
         if (created && this._menu) {
             this._webApps.adoptMenu(this._menu);
             const id = this.app.get_id();
+            this._menu.addAction('Trocar ícone…', () => this._webApps.chooseIcon(this.app));
             if (isWebApp(id)) {
                 this._menu.addAction('Duplicar com sessão isolada',
                     () => this._webApps.duplicate(this.app));
