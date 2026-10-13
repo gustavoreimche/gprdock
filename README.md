@@ -22,6 +22,8 @@ Dock flutuante para o GNOME Shell 50 com widgets vivos, inspirado no
   encosta na borda de baixo.
 - **Prévia das janelas**: parar o cursor num app com mais de uma janela mostra
   as miniaturas; clicar numa traz a janela, o X fecha.
+- **Nome ao passar o cursor** em apps e widgets (dá para desligar em
+  Configurações › Ajustes).
 - **Contador de notificações** no ícone do app (avisos na lista do GNOME, o
   contador que o app publica e o "(3)" do título de apps web).
 - **Troca automática de perfil** numa hora do dia ou ao conectar numa rede, e

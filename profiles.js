@@ -223,7 +223,8 @@ export class Profiles {
         return this._profiles[this._index];
     }
 
-    // fn(event, data); eventos: 'switched', 'changed', 'added', 'removed'.
+    // fn(event, data); eventos: 'switched', 'changed', 'added', 'removed' e
+    // 'reordered' (data.order[posição nova] = posição antiga).
     connect(fn) {
         this._listeners.add(fn);
         return fn;
@@ -280,6 +281,11 @@ export class Profiles {
         removed.forEach(index => this._emit('removed', {index}));
         if (updated.length > previous.length)
             this._emit('added');
+        // Os mesmos perfis em outra ordem.
+        const order = updated.map(p => previous.findIndex(q => q.id === p.id));
+        if (updated.length === previous.length && !order.includes(-1) &&
+            order.some((from, to) => from !== to))
+            this._emit('reordered', {order});
         this._emit('changed');
     }
 

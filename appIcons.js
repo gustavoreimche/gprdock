@@ -333,7 +333,7 @@ export function createAppItem(app, settings, appSpread, webApps) {
 
     icon.connect('notify::hover', () => {
         const hover = icon.hover;
-        if (hover)
+        if (hover && settings.get_boolean('hover-labels'))
             item.showLabel();
         else
             item.hideLabel();

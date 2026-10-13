@@ -282,8 +282,23 @@ class ProfilesPage {
         });
 
         if (total > 1) {
-            group.set_header_suffix(iconButton('user-trash-symbolic',
+            // A ordem dos perfis é a dos pontos no dock (e a das áreas de
+            // trabalho, quando ligadas a eles).
+            const move = to => this._update(id, (p, profiles) => {
+                profiles.splice(profiles.indexOf(p), 1);
+                profiles.splice(to, 0, p);
+            }, {rebuild: true});
+            const up = iconButton('go-up-symbolic', 'Mover para antes', () => move(index - 1));
+            up.sensitive = index > 0;
+            const down = iconButton('go-down-symbolic', 'Mover para depois', () => move(index + 1));
+            down.sensitive = index < total - 1;
+
+            const buttons = new Gtk.Box({valign: Gtk.Align.CENTER});
+            buttons.append(up);
+            buttons.append(down);
+            buttons.append(iconButton('user-trash-symbolic',
                 'Excluir este perfil', () => this._confirmDelete(profile)));
+            group.set_header_suffix(buttons);
         }
 
         const name = new Adw.EntryRow({
@@ -1201,6 +1216,13 @@ class SettingsPage {
         });
         this._settings.bind('notification-badges', badges, 'active', Gio.SettingsBindFlags.DEFAULT);
         group.add(badges);
+
+        const labels = new Adw.SwitchRow({
+            title: 'Nome ao passar o cursor',
+            subtitle: 'O nome do app ou do widget aparece acima do dock',
+        });
+        this._settings.bind('hover-labels', labels, 'active', Gio.SettingsBindFlags.DEFAULT);
+        group.add(labels);
         this.page.add(group);
     }
 

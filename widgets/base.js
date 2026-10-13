@@ -132,6 +132,11 @@ class Widget extends St.Button {
     }
 
     _onHover() {
+        if (this.hover)
+            this._dock.showHoverLabel?.(this);
+        else
+            this._dock.hideHoverLabel?.();
+
         const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         this.remove_transition('translation-y');
         this.ease({
@@ -455,6 +460,8 @@ class Widget extends St.Button {
     }
 
     _cleanup() {
+        if (this.hover)
+            this._dock.hideHoverLabel?.();
         this.cancellable.cancel();
         this._timers.forEach(id => GLib.source_remove(id));
         this._timers.clear();

@@ -64,6 +64,10 @@
       <default>true</default>
       <summary>Mostrar no ícone quantos avisos o app tem pendentes</summary>
     </key>
+    <key name="hover-labels" type="b">
+      <default>true</default>
+      <summary>Mostrar o nome do app ou do widget ao passar o cursor</summary>
+    </key>
     <key name="auto-profile-rules" type="s">
       <default>'[]'</default>
       <summary>Regras de troca automática de perfil (JSON)</summary>

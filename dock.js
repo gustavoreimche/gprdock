@@ -129,6 +129,29 @@ const SIDE_MARGIN = 12;
 const EDGE_HEIGHT = 2;          // faixa na borda de baixo que chama o dock de volta
 const HIDE_DELAY = 500;         // ms sem o cursor por perto antes de esconder
 const REVEAL_TIME = 180;
+const LABEL_TIME = 150;         // ms para o nome aparecer acima do item
+
+// Menus e painéis do dock. O gerenciador do GNOME troca de menu só de o
+// cursor passar por outro botão, como na barra de cima; aqui o que está
+// aberto fica até um clique: fora fecha, e em outro widget o dock decide.
+class DockMenuManager extends PopupMenu.PopupMenuManager {
+    constructor(owner, onPressOutside) {
+        super(owner);
+        this._onPressOutside = onPressOutside;
+    }
+
+    _onCapturedEvent(actor, event) {
+        const type = event.type();
+        if (type === Clutter.EventType.ENTER)
+            return Clutter.EVENT_PROPAGATE;
+
+        const result = super._onCapturedEvent(actor, event);
+        const target = global.stage.get_event_actor(event);
+        if (type === Clutter.EventType.BUTTON_PRESS && !actor.contains(target))
+            this._onPressOutside(actor._delegate, target, event.get_button());
+        return result;
+    }
+}
 
 export class Dock {
     // `monitorIndex`: em qual monitor este dock fica; o principal se não
@@ -174,7 +197,8 @@ export class Dock {
         this._container.add_child(this.actor);
         this._themedActors.add(this.actor);
 
-        this.menuManager = new PopupMenu.PopupMenuManager(this.actor);
+        this.menuManager = new DockMenuManager(this.actor,
+            (menu, target, button) => this._onPressOutsideMenu(menu, target, button));
 
         this._dots = new St.BoxLayout({
             style_class: 'gprdock-dots',
@@ -198,6 +222,11 @@ export class Dock {
         this._flash.hide();
         Main.uiGroup.add_child(this._flash);
         this._flashId = 0;
+
+        // Nome do widget com o cursor em cima, como o dos apps.
+        this._hoverLabel = new St.Label({style_class: 'dash-label'});
+        this._hoverLabel.hide();
+        Main.uiGroup.add_child(this._hoverLabel);
 
         this._menu = new PopupMenu.PopupMenu(this.actor, 0.5, St.Side.BOTTOM);
         this.registerMenu(this._menu);
@@ -338,7 +367,10 @@ export class Dock {
         this._menus.add(menu);
         // Com um menu aberto o cursor pode sair sem aviso; ao fechar, confere
         // se é hora de esconder o dock.
-        menu.connect('open-state-changed', () => this._onHoverChanged());
+        menu.connect('open-state-changed', () => {
+            this.hideHoverLabel();
+            this._onHoverChanged();
+        });
         this._themedActors.add(menu.actor);
         this._applyThemeTo(menu.actor);
         menu.actor.connect('destroy', () => {
@@ -926,6 +958,7 @@ export class Dock {
         if (this._dragging)
             return;
         this._dragging = true;
+        this.hideHoverLabel();
         this._preview?.hide();
         DND.addDragMonitor(this._dragMonitor);
     }
@@ -1042,7 +1075,72 @@ export class Dock {
         return Clutter.EVENT_STOP;
     }
 
+    // ---------- Nome ao passar o cursor ----------
+
+    _widgetLabel(widget) {
+        return widget.title ??
+            new Map(WIDGET_LABELS).get(widgetBase(widget.widgetName)) ?? widget.widgetName;
+    }
+
+    showHoverLabel(widget) {
+        if (!this.settings.get_boolean('hover-labels') || this._dragging ||
+            [...this._menus].some(menu => menu.isOpen))
+            return;
+
+        const label = this._hoverLabel;
+        label.text = this._widgetLabel(widget);
+        label.opacity = 0;
+        label.show();
+
+        const [x, y] = widget.get_transformed_position();
+        const yOffset = label.get_theme_node().get_length('-y-offset');
+        label.set_position(
+            Math.round(Math.clamp(x + (widget.width - label.width) / 2,
+                0, global.stage.width - label.width)),
+            Math.round(y - label.height - yOffset));
+        label.remove_all_transitions();
+        label.ease({
+            opacity: 255,
+            duration: LABEL_TIME,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+        });
+    }
+
+    hideHoverLabel() {
+        const label = this._hoverLabel;
+        if (!label?.visible)
+            return;
+        label.remove_all_transitions();
+        label.ease({
+            opacity: 0,
+            duration: LABEL_TIME,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            onComplete: () => label.hide(),
+        });
+    }
+
     // ---------- Menu do clique direito ----------
+
+    // Clique fora do menu aberto (que já fechou). Em outro widget, vale como
+    // clique nele; no mesmo que abriu o menu, só fecha.
+    _onPressOutsideMenu(menu, target, button) {
+        let widget = target;
+        while (widget && !(widget.widgetName && widget.onSecondaryClick))
+            widget = widget.get_parent();
+        if (!widget || !this.actor.contains(widget))
+            return;
+
+        const own = menu.sourceActor === widget;
+        if (button === Clutter.BUTTON_PRIMARY) {
+            if (!own || menu === this._menu)
+                widget.onClick();
+        } else if (button === Clutter.BUTTON_SECONDARY) {
+            if (!own || menu !== this._menu)
+                widget.onSecondaryClick();
+        } else if (button === Clutter.BUTTON_MIDDLE) {
+            widget.onMiddleClick();
+        }
+    }
 
     _openMenuAt(actor) {
         // O menu aponta para quem o abriu.
@@ -1057,8 +1155,7 @@ export class Dock {
         this._menu.removeAll();
 
         const name = widget.widgetName;
-        const label = widget.title ??
-            new Map(WIDGET_LABELS).get(widgetBase(name)) ?? name;
+        const label = this._widgetLabel(widget);
         this._menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(label));
         for (const [size, sizeLabel] of widgetSizes(name)) {
             const item = new PopupMenu.PopupMenuItem(sizeLabel);
@@ -1320,6 +1417,8 @@ export class Dock {
         if (this._flashId)
             GLib.source_remove(this._flashId);
         this._flash.destroy();
+        this._hoverLabel.destroy();
+        this._hoverLabel = null;
         this._ghost?.destroy();
         this._ghost = null;
         this._glassStrip?.destroy();

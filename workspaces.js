@@ -50,6 +50,8 @@ export class WorkspaceSync {
     }
 
     _followWorkspace() {
+        if (this._reordering)
+            return;
         const index = this._manager.get_active_workspace_index();
         // Áreas além do último perfil ficam com o perfil que já estava ativo.
         if (index < this._profiles.count)
@@ -64,7 +66,21 @@ export class WorkspaceSync {
         } else if (event === 'removed') {
             this._closeGap(data.index);
             this._activate(this._profiles.index);
+        } else if (event === 'reordered') {
+            this._reorder(data.order);
         }
+    }
+
+    // Os perfis mudaram de ordem: cada área de trabalho vai junto com o seu,
+    // com as janelas. A que está na tela continua na tela.
+    _reorder(order) {
+        const workspaces = order.map(from => this._manager.get_workspace_by_index(from));
+        this._reordering = true;
+        workspaces.forEach((workspace, to) => {
+            if (workspace)
+                this._manager.reorder_workspace(workspace, to);
+        });
+        this._reordering = false;
     }
 
     // O perfil saiu: suas janelas vão para o perfil que ficou ativo e as das
