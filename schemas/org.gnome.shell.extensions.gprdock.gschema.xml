@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.gprdock" path="/org/gnome/shell/extensions/gprdock/">
+    <key name="theme" type="s">
+      <choices>
+        <choice value="vidro"/>
+        <choice value="papel"/>
+        <choice value="neon"/>
+        <choice value="floating"/>
+      </choices>
+      <default>'vidro'</default>
+      <summary>Tema do primeiro perfil, na primeira execução</summary>
+    </key>
+    <key name="icon-size" type="i">
+      <range min="24" max="96"/>
+      <default>44</default>
+      <summary>Tamanho dos ícones dos apps, em pixels lógicos</summary>
+    </key>
+    <key name="widgets" type="as">
+      <default>['music', 'calendar', 'weather', 'battery', 'activity', 'pomodoro', 'claude']</default>
+      <summary>Widgets do primeiro perfil, na primeira execução</summary>
+    </key>
+    <key name="weather-city" type="s">
+      <default>'São Paulo'</default>
+      <summary>Nome da cidade mostrado no painel do clima</summary>
+    </key>
+    <key name="weather-latitude" type="d">
+      <default>-28.935</default>
+      <summary>Latitude usada na previsão</summary>
+    </key>
+    <key name="weather-longitude" type="d">
+      <default>-49.486</default>
+      <summary>Longitude usada na previsão</summary>
+    </key>
+    <key name="profiles" type="s">
+      <default>''</default>
+      <summary>Perfis do dock (JSON): nome, tema, widgets e apps fixados</summary>
+    </key>
+    <key name="current-profile" type="i">
+      <default>0</default>
+      <summary>Índice do perfil em uso</summary>
+    </key>
+    <key name="all-monitors" type="b">
+      <default>false</default>
+      <summary>Um dock em cada monitor, em vez de só no principal</summary>
+    </key>
+    <key name="autohide" type="b">
+      <default>false</default>
+      <summary>Ocultar o dock e mostrá-lo quando o cursor encosta na borda de baixo</summary>
+    </key>
+    <key name="bind-workspaces" type="b">
+      <default>true</default>
+      <summary>Ligar cada perfil a uma área de trabalho</summary>
+    </key>
+    <key name="saved-workspace-settings" type="s">
+      <default>''</default>
+      <summary>Configuração de áreas de trabalho anterior à extensão (JSON)</summary>
+    </key>
+    <key name="window-previews" type="b">
+      <default>true</default>
+      <summary>Mostrar miniaturas das janelas ao parar o cursor num app com mais de uma</summary>
+    </key>
+    <key name="notification-badges" type="b">
+      <default>true</default>
+      <summary>Mostrar no ícone quantos avisos o app tem pendentes</summary>
+    </key>
+    <key name="auto-profile-rules" type="s">
+      <default>'[]'</default>
+      <summary>Regras de troca automática de perfil (JSON)</summary>
+    </key>
+    <key name="focus-pomodoro" type="b">
+      <default>false</default>
+      <summary>Ligar o "Não perturbe" pelo widget também inicia o pomodoro</summary>
+    </key>
+    <key name="world-clocks" type="as">
+      <default>[]</default>
+      <summary>Fusos do relógio mundial, como Região/Cidade</summary>
+    </key>
+    <key name="click-action" type="s">
+      <choices>
+        <choice value="smart"/>
+        <choice value="cycle"/>
+        <choice value="menu"/>
+        <choice value="minimize"/>
+        <choice value="overview"/>
+        <choice value="close"/>
+        <choice value="new-window"/>
+        <choice value="focus"/>
+      </choices>
+      <default>'smart'</default>
+      <summary>O que o clique faz num app que já está aberto e em foco</summary>
+    </key>
+    <key name="middle-click-action" type="s">
+      <choices>
+        <choice value="smart"/>
+        <choice value="cycle"/>
+        <choice value="menu"/>
+        <choice value="minimize"/>
+        <choice value="overview"/>
+        <choice value="close"/>
+        <choice value="new-window"/>
+        <choice value="focus"/>
+      </choices>
+      <default>'new-window'</default>
+      <summary>O que o clique do meio faz num app que já está aberto</summary>
+    </key>
+    <key name="jarvis-url" type="s">
+      <default>'http://127.0.0.1:8765'</default>
+      <summary>Endereço do Jarvis</summary>
+    </key>
+    <key name="code-version" type="s">
+      <default>''</default>
+      <summary>Versão do código carregado; trocada pelo reload.sh para recarregar sem sair da sessão</summary>
+    </key>
+    <key name="prefs-page" type="s">
+      <default>''</default>
+      <summary>Página em que a tela de configurações deve abrir na próxima vez</summary>
+    </key>
+    <key name="git-accounts" type="s">
+      <default>'[]'</default>
+      <summary>Contas do GitHub e do GitLab (JSON, sem tokens: eles ficam no chaveiro)</summary>
+    </key>
+    <key name="emoji-recent" type="as">
+      <default>[]</default>
+      <summary>Emojis usados por último</summary>
+    </key>
+    <key name="color-history" type="as">
+      <default>[]</default>
+      <summary>Últimas cores pegas com o conta-gotas</summary>
+    </key>
+    <key name="bookmarks" type="s">
+      <default>'[]'</default>
+      <summary>Sites do widget de favoritos (JSON: nome e endereço)</summary>
+    </key>
+    <key name="shortcuts" type="s">
+      <default>'[]'</default>
+      <summary>Atalhos (JSON: nome e comando)</summary>
+    </key>
+    <key name="collections" type="s">
+      <default>'[]'</default>
+      <summary>Coleções de apps (JSON: id, nome e apps)</summary>
+    </key>
+    <key name="reminders" type="s">
+      <default>'[]'</default>
+      <summary>Lembretes pendentes (JSON)</summary>
+    </key>
+    <key name="shelf-items" type="as">
+      <default>[]</default>
+      <summary>Arquivos e links guardados na prateleira (endereços)</summary>
+    </key>
+    <key name="mascot-kind" type="s">
+      <choices>
+        <choice value="cat"/>
+        <choice value="dog"/>
+        <choice value="rabbit"/>
+      </choices>
+      <default>'cat'</default>
+      <summary>Qual bicho é o mascote</summary>
+    </key>
+    <key name="mascot-walk" type="b">
+      <default>true</default>
+      <summary>O mascote passeia em cima do dock em vez de ficar no tile</summary>
+    </key>
+    <key name="note-text" type="s">
+      <default>''</default>
+      <summary>Texto do widget de nota</summary>
+    </key>
+    <key name="water-goal" type="i">
+      <range min="1" max="30"/>
+      <default>8</default>
+      <summary>Meta diária de copos de água</summary>
+    </key>
+    <key name="water-state" type="s">
+      <default>''</default>
+      <summary>Copos de água de hoje (JSON)</summary>
+    </key>
+    <key name="countdown-date" type="s">
+      <default>''</default>
+      <summary>Data da contagem regressiva (AAAA-MM-DD)</summary>
+    </key>
+    <key name="countdown-label" type="s">
+      <default>''</default>
+      <summary>Nome da contagem regressiva</summary>
+    </key>
+    <key name="timer-minutes" type="i">
+      <range min="1" max="600"/>
+      <default>10</default>
+      <summary>Duração do timer</summary>
+    </key>
+    <key name="pomodoro-focus-minutes" type="i">
+      <range min="1" max="180"/>
+      <default>25</default>
+      <summary>Duração do foco</summary>
+    </key>
+    <key name="pomodoro-short-minutes" type="i">
+      <range min="1" max="60"/>
+      <default>5</default>
+      <summary>Duração da pausa curta</summary>
+    </key>
+    <key name="pomodoro-long-minutes" type="i">
+      <range min="1" max="120"/>
+      <default>15</default>
+      <summary>Duração da pausa longa</summary>
+    </key>
+    <key name="pomodoro-cycles" type="i">
+      <range min="1" max="12"/>
+      <default>4</default>
+      <summary>Focos até a pausa longa</summary>
+    </key>
+    <key name="pomodoro-state" type="s">
+      <default>''</default>
+      <summary>Estado interno do pomodoro (JSON)</summary>
+    </key>
+  </schema>
+</schemalist>

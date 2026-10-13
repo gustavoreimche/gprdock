@@ -1,0 +1,1693 @@
+/* ---------- Forma (igual em todos os temas) ---------- */
+
+.gprdock {
+    border-radius: 20px;
+    padding: 3px 10px;
+    spacing: 8px;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.gprdock-items {
+    spacing: 4px;
+}
+
+.gprdock-drop-placeholder {
+    width: 4px;
+    margin: 0 4px;
+    border-radius: 2px;
+}
+
+.gprdock-dots {
+    spacing: 4px;
+    padding: 0 2px;
+}
+
+.gprdock-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+}
+
+.gprdock-dot-active {
+    height: 14px;
+}
+
+.gprdock-show-apps {
+    border-radius: 13px;
+}
+
+.gprdock-show-apps StIcon {
+    icon-size: 24px;
+}
+
+.gprdock-flash {
+    font-weight: bold;
+}
+
+.gprdock .overview-tile {
+    padding: 4px;
+    margin: 0;
+    border-radius: 13px;
+    background-color: transparent;
+}
+
+.gprdock .overview-tile .overview-icon {
+    padding: 0;
+    spacing: 0;
+}
+
+.gprdock-window-dots {
+    spacing: 3px;
+}
+
+.gprdock-window-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 3px;
+}
+
+.gprdock .app-grid-running-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 3px;
+    margin-bottom: 0;
+    offset-y: 1px;
+}
+
+.gprdock-widget {
+    border-radius: 13px;
+    padding: 5px 6px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+}
+
+.gprdock-widget-wide {
+    padding: 5px 12px 5px 9px;
+}
+
+/* Desenho padrão dos tiles */
+.gprdock-tile-wide {
+    spacing: 9px;
+}
+
+.gprdock-tile-square {
+    spacing: 1px;
+}
+
+.gprdock-tile-icon {
+    icon-size: 20px;
+}
+
+.gprdock-tile-wide .gprdock-tile-icon {
+    icon-size: 24px;
+}
+
+.gprdock-tile-text {
+    max-width: 230px;
+}
+
+.gprdock-tile-caption {
+    font-size: 9px;
+    font-weight: bold;
+}
+
+.gprdock-tile-value {
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.gprdock-tile-wide .gprdock-tile-value {
+    font-size: 13px;
+}
+
+.gprdock-tile-value-alone {
+    font-size: 15px;
+}
+
+.gprdock-tile-ring-text {
+    font-size: 10px;
+    font-weight: bold;
+}
+
+/* Calendário */
+.gprdock-w-calendar {
+    padding: 0;
+}
+
+.gprdock-calendar-wide {
+    spacing: 9px;
+    padding-right: 12px;
+}
+
+.gprdock-calendar-weekday {
+    font-size: 9px;
+    font-weight: bold;
+    text-align: center;
+    padding: 2px 0;
+    border-radius: 12px 12px 0 0;
+}
+
+.gprdock-calendar-wide .gprdock-calendar-weekday {
+    border-radius: 12px 0 0 0;
+}
+
+.gprdock-calendar-day {
+    font-size: 21px;
+    font-weight: bold;
+}
+
+/* Música */
+.gprdock-music {
+    spacing: 6px;
+}
+
+.gprdock-music-art {
+    icon-size: 34px;
+    border-radius: 8px;
+}
+
+.gprdock-music-text {
+    width: 118px;
+}
+
+.gprdock-music-button {
+    padding: 4px;
+    border-radius: 99px;
+}
+
+.gprdock-music-button StIcon {
+    icon-size: 15px;
+}
+
+/* Atividade */
+.gprdock-activity {
+    spacing: 5px;
+}
+
+.gprdock-activity-row {
+    spacing: 6px;
+}
+
+.gprdock-activity-name {
+    font-size: 9px;
+    font-weight: bold;
+    width: 24px;
+}
+
+.gprdock-activity-value {
+    font-size: 10px;
+    width: 30px;
+    text-align: right;
+}
+
+.gprdock-bar {
+    width: 54px;
+    height: 6px;
+}
+
+/* Tempo: números com largura fixa para não dançar a cada segundo */
+.gprdock-w-pomodoro .gprdock-tile-value,
+.gprdock-w-timer .gprdock-tile-value,
+.gprdock-w-stopwatch .gprdock-tile-value,
+.gprdock-w-clock .gprdock-tile-value {
+    font-feature-settings: "tnum";
+}
+
+.gprdock-w-pomodoro.gprdock-widget-wide .gprdock-tile-value,
+.gprdock-w-timer.gprdock-widget-wide .gprdock-tile-value,
+.gprdock-w-stopwatch.gprdock-widget-wide .gprdock-tile-value {
+    font-size: 15px;
+    min-width: 46px;
+}
+
+/* Jarvis */
+.gprdock-jarvis-offline .gprdock-tile-icon,
+.gprdock-jarvis-muted .gprdock-tile-icon {
+    opacity: 0.45;
+}
+
+.gprdock-jarvis-listening .gprdock-tile-icon {
+    color: #ff5a52;
+}
+
+.gprdock-jarvis-thinking .gprdock-tile-icon,
+.gprdock-jarvis-working .gprdock-tile-icon {
+    color: #f5b942;
+}
+
+.gprdock-jarvis-speaking .gprdock-tile-icon {
+    color: #4cd08a;
+}
+
+/* Forma grande (3 espaços) */
+.gprdock-tile-text-large {
+    width: 300px;
+    max-width: 300px;
+}
+
+/* Largura fixa no próprio texto: é o que o faz quebrar em duas linhas. */
+.gprdock-tile-wide .gprdock-tile-value-large {
+    font-size: 11px;
+    width: 300px;
+    max-height: 30px;
+}
+
+.gprdock-w-verse .gprdock-tile-value-large {
+    font-size: 10px;
+    width: 330px;
+    max-height: 40px;
+}
+
+.gprdock-weather-large .gprdock-tile-value-large,
+.gprdock-git-large .gprdock-tile-value-large {
+    width: 130px;
+}
+
+.gprdock-music-text-large {
+    width: 240px;
+}
+
+.gprdock-weather-large,
+.gprdock-git-large {
+    spacing: 14px;
+}
+
+.gprdock-weather-large .gprdock-tile-text-large,
+.gprdock-git-large .gprdock-tile-text-large {
+    width: 130px;
+}
+
+.gprdock-weather-days {
+    spacing: 12px;
+}
+
+.gprdock-weather-day-icon {
+    icon-size: 16px;
+}
+
+.gprdock-weather-day-range {
+    font-size: 9px;
+}
+
+/* Painéis */
+.gprdock-panel {
+    min-width: 15em;
+}
+
+.gprdock-panel .gprdock-panel-content {
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+.gprdock-panel .popup-menu-item {
+    max-width: 380px;
+}
+
+/* Painéis com títulos compridos (MRs, sessões de IA): mais largos, para a
+   linha não quebrar. */
+.gprdock-panel.gprdock-panel-wide .popup-menu-item {
+    max-width: 560px;
+}
+
+.gprdock-w-collection {
+    padding: 5px;
+}
+
+.gprdock-emoji-row {
+    spacing: 2px;
+}
+
+.gprdock-emoji {
+    font-size: 18px;
+    padding: 4px 6px;
+    border-radius: 8px;
+}
+
+.gprdock-emoji:hover,
+.gprdock-emoji:focus {
+    background-color: rgba(128, 128, 128, 0.3);
+}
+
+.gprdock-note-entry {
+    width: 320px;
+}
+
+.gprdock-panel-title {
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.gprdock-panel-text {
+    font-size: 12px;
+}
+
+/* Prateleira: durante um arrasto vindo de um app */
+.gprdock .gprdock-widget.gprdock-shelf-ready {
+    border-color: rgba(128, 128, 128, 0.8);
+}
+
+.gprdock .gprdock-widget.gprdock-shelf-over {
+    border-color: #4cd08a;
+    background-color: rgba(76, 208, 138, 0.28);
+}
+
+/* Entre o que é do perfil e os apps abertos que não estão fixados */
+.gprdock-separator {
+    width: 1px;
+    margin: 0 6px;
+    background-color: rgba(128, 128, 128, 0.55);
+}
+
+.gprdock .gprdock-widget.gprdock-w-separator,
+.gprdock .gprdock-widget.gprdock-w-separator:hover {
+    background-color: transparent;
+    background-gradient-direction: none;
+    border-color: transparent;
+    box-shadow: none;
+    padding: 0;
+}
+
+/* Widgets de sessões de agentes */
+.gprdock-ai-off .gprdock-tile-icon {
+    opacity: 0.45;
+}
+
+.gprdock .gprdock-widget.gprdock-ai-attention {
+    border-color: #ffb454;
+    background-color: rgba(255, 180, 84, 0.26);
+}
+
+/* Estados que valem para qualquer widget, em todos os temas */
+.gprdock .gprdock-widget.gprdock-state-warn {
+    border-color: #ffb454;
+    background-color: rgba(255, 180, 84, 0.26);
+}
+
+.gprdock .gprdock-widget.gprdock-state-alert {
+    border-color: #ff5c5c;
+    background-color: rgba(255, 92, 92, 0.28);
+}
+
+.gprdock .gprdock-widget.gprdock-state-working {
+    border-color: #5aa9ff;
+}
+
+.gprdock .gprdock-widget.gprdock-state-live {
+    border-color: #4cd08a;
+    background-color: rgba(76, 208, 138, 0.2);
+}
+
+/* Avisos pendentes, no canto do ícone do app */
+.gprdock-badge {
+    font-size: 9pt;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #e5383b;
+    border-radius: 99px;
+    min-width: 1.1em;
+    padding: 1px 5px;
+    margin: 1px 0 0 0;
+    text-align: center;
+}
+
+/* Miniaturas das janelas, acima do ícone */
+.gprdock-preview-box {
+    padding: 8px;
+    spacing: 8px;
+}
+
+.gprdock-preview-item {
+    padding: 6px;
+    border-radius: 10px;
+}
+
+.gprdock-preview-item:hover,
+.gprdock-preview-item:focus {
+    background-color: rgba(128, 128, 128, 0.28);
+}
+
+.gprdock-preview-header {
+    spacing: 6px;
+    padding-bottom: 5px;
+}
+
+.gprdock-preview-title {
+    font-size: 9.5pt;
+}
+
+.gprdock-preview-close {
+    padding: 3px;
+    border-radius: 99px;
+}
+
+.gprdock-preview-close StIcon {
+    icon-size: 12px;
+}
+
+.gprdock-preview-close:hover {
+    background-color: rgba(255, 92, 92, 0.75);
+}
+
+
+/* ---------- Acabamento comum ---------- */
+
+/* O ícone do retângulo vira um "chip": fundo na cor do widget. */
+.gprdock-tile-wide .gprdock-tile-icon {
+    padding: 5px;
+    border-radius: 9px;
+    icon-size: 20px;
+}
+
+/* Brilho atrás do tile; só aparece (e respira) nos estados de alerta. */
+.gprdock-glow {
+    border-radius: 13px;
+    background-gradient-direction: radial;
+    background-gradient-start: rgba(255, 255, 255, 0);
+    background-gradient-end: rgba(255, 255, 255, 0);
+}
+
+.gprdock-glow.gprdock-state-alert-glow {
+    background-gradient-start: rgba(255, 92, 92, 0.55);
+    background-gradient-end: rgba(255, 92, 92, 0);
+}
+
+.gprdock-glow.gprdock-ai-attention-glow,
+.gprdock-glow.gprdock-state-warn-glow {
+    background-gradient-start: rgba(255, 180, 84, 0.5);
+    background-gradient-end: rgba(255, 180, 84, 0);
+}
+
+.gprdock-panel .popup-menu-item {
+    border-radius: 9px;
+}
+
+.gprdock-panel .popup-sub-menu {
+    border-radius: 9px;
+}
+
+/* ---------- Cor de cada widget (ícone, chip e anel) ---------- */
+.gprdock-widget.gprdock-w-music .gprdock-tile-icon {
+    color: #c084fc;
+}
+
+.gprdock-widget.gprdock-w-music .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(192, 132, 252, 0.16);
+}
+.gprdock-widget.gprdock-w-clock .gprdock-tile-icon {
+    color: #60a5fa;
+}
+
+.gprdock-widget.gprdock-w-clock .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(96, 165, 250, 0.16);
+}
+.gprdock-widget.gprdock-w-weather .gprdock-tile-icon {
+    color: #38bdf8;
+}
+
+.gprdock-widget.gprdock-w-weather .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(56, 189, 248, 0.16);
+}
+.gprdock-widget.gprdock-w-battery .gprdock-tile-icon {
+    color: #4ade80;
+}
+
+.gprdock-widget.gprdock-w-battery .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(74, 222, 128, 0.16);
+}
+.gprdock-widget.gprdock-w-battery .gprdock-ring {
+    color: #4ade80;
+}
+.gprdock-widget.gprdock-w-network .gprdock-tile-icon {
+    color: #22d3ee;
+}
+
+.gprdock-widget.gprdock-w-network .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(34, 211, 238, 0.16);
+}
+.gprdock-widget.gprdock-w-timer .gprdock-tile-icon {
+    color: #f59e0b;
+}
+
+.gprdock-widget.gprdock-w-timer .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(245, 158, 11, 0.16);
+}
+.gprdock-widget.gprdock-w-timer .gprdock-ring {
+    color: #f59e0b;
+}
+.gprdock-widget.gprdock-w-stopwatch .gprdock-tile-icon {
+    color: #a3e635;
+}
+
+.gprdock-widget.gprdock-w-stopwatch .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(163, 230, 53, 0.16);
+}
+.gprdock-widget.gprdock-w-countdown .gprdock-tile-icon {
+    color: #f472b6;
+}
+
+.gprdock-widget.gprdock-w-countdown .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(244, 114, 182, 0.16);
+}
+.gprdock-widget.gprdock-w-countdown .gprdock-ring {
+    color: #f472b6;
+}
+.gprdock-widget.gprdock-w-timeprogress .gprdock-tile-icon {
+    color: #818cf8;
+}
+
+.gprdock-widget.gprdock-w-timeprogress .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(129, 140, 248, 0.16);
+}
+.gprdock-widget.gprdock-w-timeprogress .gprdock-ring {
+    color: #818cf8;
+}
+.gprdock-widget.gprdock-w-water .gprdock-tile-icon {
+    color: #38bdf8;
+}
+
+.gprdock-widget.gprdock-w-water .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(56, 189, 248, 0.16);
+}
+.gprdock-widget.gprdock-w-water .gprdock-ring {
+    color: #38bdf8;
+}
+.gprdock-widget.gprdock-w-note .gprdock-tile-icon {
+    color: #fbbf24;
+}
+
+.gprdock-widget.gprdock-w-note .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(251, 191, 36, 0.16);
+}
+.gprdock-widget.gprdock-w-verse .gprdock-tile-icon {
+    color: #d4a373;
+}
+
+.gprdock-widget.gprdock-w-verse .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(212, 163, 115, 0.16);
+}
+.gprdock-widget.gprdock-w-clipboard .gprdock-tile-icon {
+    color: #94a3b8;
+}
+
+.gprdock-widget.gprdock-w-clipboard .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(148, 163, 184, 0.16);
+}
+.gprdock-widget.gprdock-w-emoji .gprdock-tile-icon {
+    color: #fbbf24;
+}
+
+.gprdock-widget.gprdock-w-emoji .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(251, 191, 36, 0.16);
+}
+.gprdock-widget.gprdock-w-colorpicker .gprdock-tile-icon {
+    color: #f472b6;
+}
+
+.gprdock-widget.gprdock-w-colorpicker .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(244, 114, 182, 0.16);
+}
+.gprdock-widget.gprdock-w-screenshots .gprdock-tile-icon {
+    color: #a78bfa;
+}
+
+.gprdock-widget.gprdock-w-screenshots .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(167, 139, 250, 0.16);
+}
+.gprdock-widget.gprdock-w-files .gprdock-tile-icon {
+    color: #60a5fa;
+}
+
+.gprdock-widget.gprdock-w-files .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(96, 165, 250, 0.16);
+}
+.gprdock-widget.gprdock-w-bookmarks .gprdock-tile-icon {
+    color: #fb7185;
+}
+
+.gprdock-widget.gprdock-w-bookmarks .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(251, 113, 133, 0.16);
+}
+.gprdock-widget.gprdock-w-shortcuts .gprdock-tile-icon {
+    color: #34d399;
+}
+
+.gprdock-widget.gprdock-w-shortcuts .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(52, 211, 153, 0.16);
+}
+.gprdock-widget.gprdock-w-collection .gprdock-tile-icon {
+    color: #818cf8;
+}
+
+.gprdock-widget.gprdock-w-collection .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(129, 140, 248, 0.16);
+}
+.gprdock-widget.gprdock-w-reminders .gprdock-tile-icon {
+    color: #f59e0b;
+}
+
+.gprdock-widget.gprdock-w-reminders .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(245, 158, 11, 0.16);
+}
+.gprdock-widget.gprdock-w-converter .gprdock-tile-icon {
+    color: #2dd4bf;
+}
+
+.gprdock-widget.gprdock-w-converter .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(45, 212, 191, 0.16);
+}
+.gprdock-widget.gprdock-w-shelf .gprdock-tile-icon {
+    color: #fbbf24;
+}
+
+.gprdock-widget.gprdock-w-shelf .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(251, 191, 36, 0.16);
+}
+.gprdock-widget.gprdock-w-docker .gprdock-tile-icon {
+    color: #38bdf8;
+}
+
+.gprdock-widget.gprdock-w-docker .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(56, 189, 248, 0.16);
+}
+.gprdock-widget.gprdock-w-git .gprdock-tile-icon {
+    color: #c084fc;
+}
+
+.gprdock-widget.gprdock-w-git .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(192, 132, 252, 0.16);
+}
+.gprdock-widget.gprdock-w-claude .gprdock-tile-icon {
+    color: #e8956a;
+}
+
+.gprdock-widget.gprdock-w-claude .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(232, 149, 106, 0.16);
+}
+.gprdock-widget.gprdock-w-jarvis .gprdock-tile-icon {
+    color: #22d3ee;
+}
+
+.gprdock-widget.gprdock-w-jarvis .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(34, 211, 238, 0.16);
+}
+.gprdock-widget.gprdock-w-engine .gprdock-tile-icon {
+    color: #a78bfa;
+}
+
+.gprdock-widget.gprdock-w-engine .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(167, 139, 250, 0.16);
+}
+.gprdock-widget.gprdock-w-vpn .gprdock-tile-icon {
+    color: #4ade80;
+}
+
+.gprdock-widget.gprdock-w-vpn .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(74, 222, 128, 0.16);
+}
+.gprdock-widget.gprdock-w-audio .gprdock-tile-icon {
+    color: #60a5fa;
+}
+
+.gprdock-widget.gprdock-w-audio .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(96, 165, 250, 0.16);
+}
+.gprdock-widget.gprdock-w-mic .gprdock-tile-icon {
+    color: #4ade80;
+}
+
+.gprdock-widget.gprdock-w-mic .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(74, 222, 128, 0.16);
+}
+.gprdock-widget.gprdock-w-focus .gprdock-tile-icon {
+    color: #f59e0b;
+}
+
+.gprdock-widget.gprdock-w-focus .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(245, 158, 11, 0.16);
+}
+.gprdock-widget.gprdock-w-ports .gprdock-tile-icon {
+    color: #2dd4bf;
+}
+
+.gprdock-widget.gprdock-w-ports .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(45, 212, 191, 0.16);
+}
+.gprdock-widget.gprdock-w-meeting .gprdock-tile-icon {
+    color: #f472b6;
+}
+
+.gprdock-widget.gprdock-w-meeting .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(244, 114, 182, 0.16);
+}
+.gprdock-widget.gprdock-w-claudecode .gprdock-tile-icon {
+    color: #f97316;
+}
+
+.gprdock-widget.gprdock-w-claudecode .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(249, 115, 22, 0.16);
+}
+.gprdock-widget.gprdock-w-toggles .gprdock-tile-icon {
+    color: #94a3b8;
+}
+
+.gprdock-widget.gprdock-w-toggles .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(148, 163, 184, 0.16);
+}
+.gprdock-widget.gprdock-w-storage .gprdock-tile-icon {
+    color: #818cf8;
+}
+
+.gprdock-widget.gprdock-w-storage .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(129, 140, 248, 0.16);
+}
+.gprdock-widget.gprdock-w-storage .gprdock-ring {
+    color: #818cf8;
+}
+.gprdock-widget.gprdock-w-worldclock .gprdock-tile-icon {
+    color: #60a5fa;
+}
+
+.gprdock-widget.gprdock-w-worldclock .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(96, 165, 250, 0.16);
+}
+.gprdock-widget.gprdock-w-voicememo .gprdock-tile-icon {
+    color: #ef4444;
+}
+
+.gprdock-widget.gprdock-w-voicememo .gprdock-tile-wide .gprdock-tile-icon {
+    background-color: rgba(239, 68, 68, 0.16);
+}
+
+/* ---------- Tema: Vidro ---------- */
+
+.gprdock.gprdock-theme-vidro {
+    background-color: rgba(28, 28, 34, 0.78);
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+    color: #f2f2f5;
+}
+
+.gprdock-theme-vidro .overview-tile:hover,
+.gprdock-theme-vidro .overview-tile:focus {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.gprdock-theme-vidro .gprdock-drop-placeholder {
+    background-color: #5aa9ff;
+}
+
+.gprdock-theme-vidro .gprdock-activity-name {
+    color: rgba(242, 242, 245, 0.65);
+}
+
+.gprdock-theme-vidro .gprdock-dot {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.gprdock-theme-vidro .gprdock-dot-active {
+    background-color: #f2f2f5;
+}
+
+.gprdock-theme-vidro .gprdock-show-apps:hover,
+.gprdock-theme-vidro .gprdock-show-apps:focus {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.gprdock-theme-vidro .gprdock-window-dot,
+.gprdock-theme-vidro .app-grid-running-dot {
+    background-color: #f2f2f5;
+}
+
+.gprdock-theme-vidro .gprdock-widget {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #f2f2f5;
+}
+
+.gprdock-theme-vidro .gprdock-widget:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.gprdock-theme-vidro .gprdock-calendar-weekday {
+    background-color: #e5484d;
+    color: #ffffff;
+}
+
+.gprdock-theme-vidro .gprdock-tile-caption,
+.gprdock-theme-vidro .gprdock-activity-name {
+    color: rgba(242, 242, 245, 0.65);
+}
+
+.gprdock-theme-vidro .gprdock-music-button:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+.gprdock-theme-vidro .gprdock-ring,
+.gprdock-theme-vidro .gprdock-heatmap,
+.gprdock-theme-vidro .gprdock-bar {
+    color: #5aa9ff;
+}
+
+.gprdock-theme-vidro .gprdock-w-pomodoro .gprdock-ring {
+    color: #ff6b5e;
+}
+
+.gprdock-theme-vidro .gprdock-pomodoro-break .gprdock-ring {
+    color: #4cd08a;
+}
+
+.gprdock-theme-vidro .gprdock-w-claude .gprdock-ring {
+    color: #e8956a;
+}
+
+.gprdock-theme-vidro .gprdock-claude-high .gprdock-ring {
+    color: #ff5a52;
+}
+
+.gprdock-panel.gprdock-theme-vidro .gprdock-panel-content {
+    background-color: rgba(28, 28, 34, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #f2f2f5;
+}
+
+.gprdock-panel.gprdock-theme-vidro .popup-menu-item,
+.gprdock-panel.gprdock-theme-vidro .popup-menu-item:insensitive {
+    color: #f2f2f5;
+}
+
+/* ---------- Tema: Papel ---------- */
+
+.gprdock.gprdock-theme-papel {
+    background-color: #f4efe4;
+    border-color: #d8cfbc;
+    box-shadow: 0 4px 14px rgba(60, 45, 20, 0.28);
+    color: #2b2824;
+}
+
+.gprdock-theme-papel .overview-tile:hover,
+.gprdock-theme-papel .overview-tile:focus {
+    background-color: rgba(60, 45, 20, 0.1);
+}
+
+.gprdock-theme-papel .gprdock-drop-placeholder {
+    background-color: #b4532a;
+}
+
+.gprdock-theme-papel .gprdock-activity-name {
+    color: #7a7062;
+}
+
+.gprdock-theme-papel .gprdock-dot {
+    background-color: rgba(60, 45, 20, 0.25);
+}
+
+.gprdock-theme-papel .gprdock-dot-active {
+    background-color: #b4532a;
+}
+
+.gprdock-theme-papel .gprdock-show-apps:hover,
+.gprdock-theme-papel .gprdock-show-apps:focus {
+    background-color: rgba(60, 45, 20, 0.1);
+}
+
+.gprdock-theme-papel .gprdock-window-dot,
+.gprdock-theme-papel .app-grid-running-dot {
+    background-color: #6b6256;
+}
+
+.gprdock-theme-papel .gprdock-widget {
+    background-color: #fbf8f1;
+    border-color: #e0d7c5;
+    color: #2b2824;
+}
+
+.gprdock-theme-papel .gprdock-widget:hover {
+    background-color: #ffffff;
+}
+
+.gprdock-theme-papel .gprdock-calendar-weekday {
+    background-color: #b4532a;
+    color: #fbf8f1;
+}
+
+.gprdock-theme-papel .gprdock-tile-caption,
+.gprdock-theme-papel .gprdock-activity-name {
+    color: #7a7062;
+}
+
+.gprdock-theme-papel .gprdock-music-button:hover {
+    background-color: rgba(60, 45, 20, 0.12);
+}
+
+.gprdock-theme-papel .gprdock-ring,
+.gprdock-theme-papel .gprdock-heatmap,
+.gprdock-theme-papel .gprdock-bar {
+    color: #3d6b8c;
+}
+
+.gprdock-theme-papel .gprdock-w-pomodoro .gprdock-ring {
+    color: #b4532a;
+}
+
+.gprdock-theme-papel .gprdock-pomodoro-break .gprdock-ring {
+    color: #4f7d4a;
+}
+
+.gprdock-theme-papel .gprdock-w-claude .gprdock-ring {
+    color: #c2673f;
+}
+
+.gprdock-theme-papel .gprdock-claude-high .gprdock-ring {
+    color: #b3261e;
+}
+
+.gprdock-panel.gprdock-theme-papel .gprdock-panel-content {
+    background-color: #f4efe4;
+    border: 1px solid #d8cfbc;
+    color: #2b2824;
+}
+
+.gprdock-panel.gprdock-theme-papel .popup-menu-item,
+.gprdock-panel.gprdock-theme-papel .popup-menu-item:insensitive {
+    color: #2b2824;
+}
+
+/* ---------- Tema: Neon ---------- */
+
+.gprdock.gprdock-theme-neon {
+    background-color: rgba(8, 8, 18, 0.93);
+    border-color: #00e5ff;
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.6);
+    color: #e8fbff;
+}
+
+.gprdock-theme-neon .overview-tile:hover,
+.gprdock-theme-neon .overview-tile:focus {
+    background-color: rgba(0, 229, 255, 0.16);
+}
+
+.gprdock-theme-neon .gprdock-drop-placeholder {
+    background-color: #00e5ff;
+}
+
+.gprdock-theme-neon .gprdock-activity-name {
+    color: #7fdfee;
+}
+
+.gprdock-theme-neon .gprdock-dot {
+    background-color: rgba(0, 229, 255, 0.35);
+}
+
+.gprdock-theme-neon .gprdock-dot-active {
+    background-color: #ff2bd6;
+}
+
+.gprdock-theme-neon .gprdock-show-apps:hover,
+.gprdock-theme-neon .gprdock-show-apps:focus {
+    background-color: rgba(0, 229, 255, 0.16);
+}
+
+.gprdock-theme-neon .gprdock-window-dot,
+.gprdock-theme-neon .app-grid-running-dot {
+    background-color: #00e5ff;
+}
+
+.gprdock-theme-neon .gprdock-widget {
+    background-color: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 43, 214, 0.65);
+    color: #e8fbff;
+}
+
+.gprdock-theme-neon .gprdock-widget:hover {
+    background-color: rgba(255, 43, 214, 0.16);
+    border-color: #ff2bd6;
+}
+
+.gprdock-theme-neon .gprdock-calendar-weekday {
+    background-color: #ff2bd6;
+    color: #0a0a14;
+}
+
+.gprdock-theme-neon .gprdock-tile-caption,
+.gprdock-theme-neon .gprdock-activity-name {
+    color: #7fdfee;
+}
+
+.gprdock-theme-neon .gprdock-music-button:hover {
+    background-color: rgba(0, 229, 255, 0.22);
+}
+
+.gprdock-theme-neon .gprdock-ring,
+.gprdock-theme-neon .gprdock-heatmap,
+.gprdock-theme-neon .gprdock-bar {
+    color: #00e5ff;
+}
+
+.gprdock-theme-neon .gprdock-w-pomodoro .gprdock-ring {
+    color: #ff2bd6;
+}
+
+.gprdock-theme-neon .gprdock-pomodoro-break .gprdock-ring {
+    color: #7dff5a;
+}
+
+.gprdock-theme-neon .gprdock-w-claude .gprdock-ring {
+    color: #ffb000;
+}
+
+.gprdock-theme-neon .gprdock-claude-high .gprdock-ring {
+    color: #ff3355;
+}
+
+.gprdock-panel.gprdock-theme-neon .gprdock-panel-content {
+    background-color: rgba(8, 8, 18, 0.96);
+    border: 1px solid #00e5ff;
+    color: #e8fbff;
+}
+
+.gprdock-panel.gprdock-theme-neon .popup-menu-item,
+.gprdock-panel.gprdock-theme-neon .popup-menu-item:insensitive {
+    color: #e8fbff;
+}
+
+/* ---------- Tema: Floating ---------- */
+
+/* Sem barra: os ícones flutuam e só os widgets têm fundo. */
+.gprdock.gprdock-theme-floating {
+    background-color: transparent;
+    border-color: transparent;
+    color: #f5f5f7;
+}
+
+.gprdock-theme-floating .gprdock-items {
+    spacing: 10px;
+}
+
+.gprdock-theme-floating .gprdock-drop-placeholder {
+    background-color: #f5f5f7;
+}
+
+.gprdock-theme-floating .gprdock-dot {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.gprdock-theme-floating .gprdock-dot-active {
+    background-color: #ffffff;
+}
+
+.gprdock-theme-floating .overview-tile:hover,
+.gprdock-theme-floating .overview-tile:focus,
+.gprdock-theme-floating .gprdock-show-apps:hover,
+.gprdock-theme-floating .gprdock-show-apps:focus {
+    background-color: rgba(255, 255, 255, 0.14);
+}
+
+.gprdock-theme-floating .gprdock-show-apps {
+    color: #f5f5f7;
+}
+
+/* Indicador de "aberto" em forma de traço, um por janela. */
+.gprdock-theme-floating .gprdock-window-dot,
+.gprdock-theme-floating .app-grid-running-dot {
+    width: 9px;
+    height: 4px;
+    border-radius: 2px;
+    background-color: #f5f5f7;
+}
+
+/* Widgets de vidro: o fundo é o papel de parede borrado, posto atrás deles
+   pelo dock (GlassStrip); aqui vai só a tinta por cima e o contorno. */
+.gprdock-theme-floating .gprdock-widget {
+    /* Vidro fumê: tinta preta, um pouco mais clara em cima, como se a luz
+       viesse de lá; o contorno claro faz a aresta do vidro. */
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(38, 38, 38, 0.34);
+    background-gradient-end: rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    /* Sem sombra: com fundo em degradê o St a desenha quadrada, e ela
+       apareceria através do vidro. */
+    box-shadow: none;
+    color: #f5f5f7;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    icon-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.gprdock-theme-floating .gprdock-widget:hover {
+    background-gradient-start: rgba(70, 70, 70, 0.36);
+    background-gradient-end: rgba(20, 20, 20, 0.5);
+    border-color: rgba(255, 255, 255, 0.34);
+}
+
+.gprdock-theme-floating .gprdock-calendar-weekday {
+    background-color: #e5484d;
+    color: #ffffff;
+    border-radius: 15px 15px 0 0;
+}
+
+.gprdock-theme-floating .gprdock-tile-caption,
+.gprdock-theme-floating .gprdock-activity-name {
+    color: rgba(245, 245, 247, 0.6);
+}
+
+.gprdock-theme-floating .gprdock-music-button:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+.gprdock-theme-floating .gprdock-ring,
+.gprdock-theme-floating .gprdock-heatmap,
+.gprdock-theme-floating .gprdock-bar {
+    color: #f5f5f7;
+}
+
+.gprdock-theme-floating .gprdock-w-pomodoro .gprdock-ring {
+    color: #ff6b5e;
+}
+
+.gprdock-theme-floating .gprdock-pomodoro-break .gprdock-ring {
+    color: #4cd08a;
+}
+
+.gprdock-theme-floating .gprdock-w-claude .gprdock-ring {
+    color: #e8956a;
+}
+
+.gprdock-theme-floating .gprdock-claude-high .gprdock-ring {
+    color: #ff5a52;
+}
+
+.gprdock-panel.gprdock-theme-floating .gprdock-panel-content {
+    background-color: rgba(22, 22, 28, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    color: #f5f5f7;
+}
+
+/* De vidro: translúcido, com a tela borrada atrás (ver glass.js). */
+.gprdock-panel .gprdock-panel-content.gprdock-panel-glass {
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(38, 38, 38, 0.36);
+    background-gradient-end: rgba(0, 0, 0, 0.52);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: none;
+}
+
+.gprdock-panel.gprdock-theme-floating .popup-menu-item,
+.gprdock-panel.gprdock-theme-floating .popup-menu-item:insensitive {
+    color: #f5f5f7;
+}
+
+/* ---------- Tema: Nord ---------- */
+
+.gprdock.gprdock-theme-nord {
+    background-color: rgba(46, 52, 64, 0.93);
+    border-color: rgba(216, 222, 233, 0.18);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    color: #eceff4;
+}
+
+.gprdock-theme-nord .overview-tile:hover,
+.gprdock-theme-nord .overview-tile:focus,
+.gprdock-theme-nord .gprdock-show-apps:hover,
+.gprdock-theme-nord .gprdock-show-apps:focus,
+.gprdock-theme-nord .gprdock-music-button:hover {
+    background-color: rgba(136, 192, 208, 0.2);
+}
+
+.gprdock-theme-nord .gprdock-drop-placeholder,
+.gprdock-theme-nord .gprdock-dot-active,
+.gprdock-theme-nord .gprdock-window-dot,
+.gprdock-theme-nord .app-grid-running-dot {
+    background-color: #88c0d0;
+}
+
+.gprdock-theme-nord .gprdock-dot {
+    background-color: rgba(216, 222, 233, 0.3);
+}
+
+.gprdock-theme-nord .gprdock-widget {
+    background-color: rgba(216, 222, 233, 0.07);
+    border-color: transparent;
+    color: #eceff4;
+}
+
+.gprdock-theme-nord .gprdock-widget:hover {
+    background-color: rgba(136, 192, 208, 0.2);
+}
+
+.gprdock-theme-nord .gprdock-calendar-weekday {
+    background-color: #bf616a;
+    color: #eceff4;
+}
+
+.gprdock-theme-nord .gprdock-tile-caption,
+.gprdock-theme-nord .gprdock-activity-name {
+    color: #a9b4c6;
+}
+
+.gprdock-theme-nord .gprdock-ring,
+.gprdock-theme-nord .gprdock-heatmap,
+.gprdock-theme-nord .gprdock-bar {
+    color: #88c0d0;
+}
+
+.gprdock-theme-nord .gprdock-w-pomodoro .gprdock-ring,
+.gprdock-theme-nord .gprdock-claude-high .gprdock-ring {
+    color: #bf616a;
+}
+
+.gprdock-theme-nord .gprdock-pomodoro-break .gprdock-ring {
+    color: #a3be8c;
+}
+
+.gprdock-theme-nord .gprdock-w-claude .gprdock-ring {
+    color: #d08770;
+}
+
+.gprdock-panel.gprdock-theme-nord .gprdock-panel-content {
+    background-color: rgba(46, 52, 64, 0.97);
+    border: 1px solid rgba(216, 222, 233, 0.18);
+    color: #eceff4;
+}
+
+.gprdock-panel.gprdock-theme-nord .popup-menu-item,
+.gprdock-panel.gprdock-theme-nord .popup-menu-item:insensitive {
+    color: #eceff4;
+}
+
+/* ---------- Tema: Dracula ---------- */
+
+.gprdock.gprdock-theme-dracula {
+    background-color: rgba(40, 42, 54, 0.94);
+    border-color: rgba(189, 147, 249, 0.45);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+    color: #f8f8f2;
+}
+
+.gprdock-theme-dracula .overview-tile:hover,
+.gprdock-theme-dracula .overview-tile:focus,
+.gprdock-theme-dracula .gprdock-show-apps:hover,
+.gprdock-theme-dracula .gprdock-show-apps:focus,
+.gprdock-theme-dracula .gprdock-music-button:hover {
+    background-color: rgba(189, 147, 249, 0.22);
+}
+
+.gprdock-theme-dracula .gprdock-drop-placeholder,
+.gprdock-theme-dracula .gprdock-dot-active,
+.gprdock-theme-dracula .gprdock-window-dot,
+.gprdock-theme-dracula .app-grid-running-dot {
+    background-color: #bd93f9;
+}
+
+.gprdock-theme-dracula .gprdock-dot {
+    background-color: rgba(248, 248, 242, 0.28);
+}
+
+.gprdock-theme-dracula .gprdock-widget {
+    background-color: rgba(248, 248, 242, 0.06);
+    border-color: transparent;
+    color: #f8f8f2;
+}
+
+.gprdock-theme-dracula .gprdock-widget:hover {
+    background-color: rgba(189, 147, 249, 0.22);
+}
+
+.gprdock-theme-dracula .gprdock-calendar-weekday {
+    background-color: #ff79c6;
+    color: #282a36;
+}
+
+.gprdock-theme-dracula .gprdock-tile-caption,
+.gprdock-theme-dracula .gprdock-activity-name {
+    color: #b9b7cf;
+}
+
+.gprdock-theme-dracula .gprdock-ring,
+.gprdock-theme-dracula .gprdock-heatmap,
+.gprdock-theme-dracula .gprdock-bar {
+    color: #bd93f9;
+}
+
+.gprdock-theme-dracula .gprdock-w-pomodoro .gprdock-ring,
+.gprdock-theme-dracula .gprdock-claude-high .gprdock-ring {
+    color: #ff79c6;
+}
+
+.gprdock-theme-dracula .gprdock-pomodoro-break .gprdock-ring {
+    color: #50fa7b;
+}
+
+.gprdock-theme-dracula .gprdock-w-claude .gprdock-ring {
+    color: #ffb86c;
+}
+
+.gprdock-panel.gprdock-theme-dracula .gprdock-panel-content {
+    background-color: rgba(40, 42, 54, 0.97);
+    border: 1px solid rgba(189, 147, 249, 0.45);
+    color: #f8f8f2;
+}
+
+.gprdock-panel.gprdock-theme-dracula .popup-menu-item,
+.gprdock-panel.gprdock-theme-dracula .popup-menu-item:insensitive {
+    color: #f8f8f2;
+}
+
+/* ---------- Tema: Poente ---------- */
+
+.gprdock.gprdock-theme-poente {
+    background-color: rgba(52, 24, 44, 0.92);
+    border-color: rgba(255, 159, 90, 0.4);
+    box-shadow: 0 6px 22px rgba(120, 30, 40, 0.45);
+    color: #fff1e6;
+}
+
+.gprdock-theme-poente .overview-tile:hover,
+.gprdock-theme-poente .overview-tile:focus,
+.gprdock-theme-poente .gprdock-show-apps:hover,
+.gprdock-theme-poente .gprdock-show-apps:focus,
+.gprdock-theme-poente .gprdock-music-button:hover {
+    background-color: rgba(255, 159, 90, 0.2);
+}
+
+.gprdock-theme-poente .gprdock-drop-placeholder,
+.gprdock-theme-poente .gprdock-dot-active,
+.gprdock-theme-poente .gprdock-window-dot,
+.gprdock-theme-poente .app-grid-running-dot {
+    background-color: #ff9f5a;
+}
+
+.gprdock-theme-poente .gprdock-dot {
+    background-color: rgba(255, 241, 230, 0.28);
+}
+
+.gprdock-theme-poente .gprdock-widget {
+    background-color: rgba(255, 241, 230, 0.07);
+    border-color: transparent;
+    color: #fff1e6;
+}
+
+.gprdock-theme-poente .gprdock-widget:hover {
+    background-color: rgba(255, 159, 90, 0.2);
+}
+
+.gprdock-theme-poente .gprdock-calendar-weekday {
+    background-color: #ff5f7e;
+    color: #34182c;
+}
+
+.gprdock-theme-poente .gprdock-tile-caption,
+.gprdock-theme-poente .gprdock-activity-name {
+    color: #e3b9a8;
+}
+
+.gprdock-theme-poente .gprdock-ring,
+.gprdock-theme-poente .gprdock-heatmap,
+.gprdock-theme-poente .gprdock-bar {
+    color: #ff9f5a;
+}
+
+.gprdock-theme-poente .gprdock-w-pomodoro .gprdock-ring,
+.gprdock-theme-poente .gprdock-claude-high .gprdock-ring {
+    color: #ff5f7e;
+}
+
+.gprdock-theme-poente .gprdock-pomodoro-break .gprdock-ring {
+    color: #7fe0b0;
+}
+
+.gprdock-theme-poente .gprdock-w-claude .gprdock-ring {
+    color: #ffd166;
+}
+
+.gprdock-panel.gprdock-theme-poente .gprdock-panel-content {
+    background-color: rgba(52, 24, 44, 0.97);
+    border: 1px solid rgba(255, 159, 90, 0.4);
+    color: #fff1e6;
+}
+
+.gprdock-panel.gprdock-theme-poente .popup-menu-item,
+.gprdock-panel.gprdock-theme-poente .popup-menu-item:insensitive {
+    color: #fff1e6;
+}
+
+/* ---------- Tema: Grafite ---------- */
+
+.gprdock.gprdock-theme-grafite {
+    background-color: #1b1b1d;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+    color: #e6e6e6;
+}
+
+.gprdock-theme-grafite .overview-tile:hover,
+.gprdock-theme-grafite .overview-tile:focus,
+.gprdock-theme-grafite .gprdock-show-apps:hover,
+.gprdock-theme-grafite .gprdock-show-apps:focus,
+.gprdock-theme-grafite .gprdock-music-button:hover {
+    background-color: rgba(255, 255, 255, 0.09);
+}
+
+.gprdock-theme-grafite .gprdock-drop-placeholder,
+.gprdock-theme-grafite .gprdock-dot-active,
+.gprdock-theme-grafite .gprdock-window-dot,
+.gprdock-theme-grafite .app-grid-running-dot {
+    background-color: #e6e6e6;
+}
+
+.gprdock-theme-grafite .gprdock-dot {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.gprdock-theme-grafite .gprdock-widget {
+    background-color: transparent;
+    border-color: transparent;
+    color: #e6e6e6;
+}
+
+.gprdock-theme-grafite .gprdock-widget:hover {
+    background-color: rgba(255, 255, 255, 0.09);
+}
+
+.gprdock-theme-grafite .gprdock-calendar-weekday {
+    background-color: #ff6b5e;
+    color: #1b1b1d;
+}
+
+.gprdock-theme-grafite .gprdock-tile-caption,
+.gprdock-theme-grafite .gprdock-activity-name {
+    color: #9a9a9a;
+}
+
+.gprdock-theme-grafite .gprdock-ring,
+.gprdock-theme-grafite .gprdock-heatmap,
+.gprdock-theme-grafite .gprdock-bar {
+    color: #e6e6e6;
+}
+
+.gprdock-theme-grafite .gprdock-w-pomodoro .gprdock-ring,
+.gprdock-theme-grafite .gprdock-claude-high .gprdock-ring {
+    color: #ff6b5e;
+}
+
+.gprdock-theme-grafite .gprdock-pomodoro-break .gprdock-ring {
+    color: #7fd18b;
+}
+
+.gprdock-theme-grafite .gprdock-w-claude .gprdock-ring {
+    color: #e8b266;
+}
+
+.gprdock-panel.gprdock-theme-grafite .gprdock-panel-content {
+    background-color: #1b1b1d;
+    border: 1px solid transparent;
+    color: #e6e6e6;
+}
+
+.gprdock-panel.gprdock-theme-grafite .popup-menu-item,
+.gprdock-panel.gprdock-theme-grafite .popup-menu-item:insensitive {
+    color: #e6e6e6;
+}
+
+/* ---------- Tema: Menta ---------- */
+
+.gprdock.gprdock-theme-menta {
+    background-color: rgba(236, 246, 240, 0.95);
+    border-color: rgba(0, 80, 50, 0.16);
+    box-shadow: 0 6px 20px rgba(0, 40, 25, 0.25);
+    color: #1c2b24;
+}
+
+.gprdock-theme-menta .overview-tile:hover,
+.gprdock-theme-menta .overview-tile:focus,
+.gprdock-theme-menta .gprdock-show-apps:hover,
+.gprdock-theme-menta .gprdock-show-apps:focus,
+.gprdock-theme-menta .gprdock-music-button:hover {
+    background-color: rgba(31, 157, 107, 0.16);
+}
+
+.gprdock-theme-menta .gprdock-drop-placeholder,
+.gprdock-theme-menta .gprdock-dot-active,
+.gprdock-theme-menta .gprdock-window-dot,
+.gprdock-theme-menta .app-grid-running-dot {
+    background-color: #1f9d6b;
+}
+
+.gprdock-theme-menta .gprdock-dot {
+    background-color: rgba(28, 43, 36, 0.25);
+}
+
+.gprdock-theme-menta .gprdock-widget {
+    background-color: rgba(28, 43, 36, 0.06);
+    border-color: transparent;
+    color: #1c2b24;
+}
+
+.gprdock-theme-menta .gprdock-widget:hover {
+    background-color: rgba(31, 157, 107, 0.16);
+}
+
+.gprdock-theme-menta .gprdock-calendar-weekday {
+    background-color: #e0563f;
+    color: #ffffff;
+}
+
+.gprdock-theme-menta .gprdock-tile-caption,
+.gprdock-theme-menta .gprdock-activity-name {
+    color: #5b7166;
+}
+
+.gprdock-theme-menta .gprdock-ring,
+.gprdock-theme-menta .gprdock-heatmap,
+.gprdock-theme-menta .gprdock-bar {
+    color: #1f9d6b;
+}
+
+.gprdock-theme-menta .gprdock-w-pomodoro .gprdock-ring,
+.gprdock-theme-menta .gprdock-claude-high .gprdock-ring {
+    color: #e0563f;
+}
+
+.gprdock-theme-menta .gprdock-pomodoro-break .gprdock-ring {
+    color: #1f9d6b;
+}
+
+.gprdock-theme-menta .gprdock-w-claude .gprdock-ring {
+    color: #c77d1e;
+}
+
+.gprdock-panel.gprdock-theme-menta .gprdock-panel-content {
+    background-color: rgba(240, 248, 243, 0.98);
+    border: 1px solid rgba(0, 80, 50, 0.16);
+    color: #1c2b24;
+}
+
+.gprdock-panel.gprdock-theme-menta .popup-menu-item,
+.gprdock-panel.gprdock-theme-menta .popup-menu-item:insensitive {
+    color: #1c2b24;
+}
+
+/* ---------- Acabamento por tema: luz vindo de cima nos widgets ---------- */
+
+.gprdock-theme-vidro .gprdock-widget {
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(255, 255, 255, 0.14);
+    background-gradient-end: rgba(255, 255, 255, 0.05);
+}
+
+.gprdock-theme-vidro .gprdock-widget:hover {
+    background-gradient-start: rgba(255, 255, 255, 0.2);
+    background-gradient-end: rgba(255, 255, 255, 0.1);
+}
+
+.gprdock-theme-nord .gprdock-widget {
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(216, 222, 233, 0.12);
+    background-gradient-end: rgba(216, 222, 233, 0.04);
+}
+
+.gprdock-theme-nord .gprdock-widget:hover {
+    background-gradient-start: rgba(216, 222, 233, 0.18);
+    background-gradient-end: rgba(216, 222, 233, 0.08);
+}
+
+.gprdock-theme-dracula .gprdock-widget {
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(248, 248, 242, 0.11);
+    background-gradient-end: rgba(248, 248, 242, 0.03);
+}
+
+.gprdock-theme-dracula .gprdock-widget:hover {
+    background-gradient-start: rgba(189, 147, 249, 0.22);
+    background-gradient-end: rgba(189, 147, 249, 0.08);
+}
+
+.gprdock-theme-poente .gprdock-widget {
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(255, 241, 230, 0.12);
+    background-gradient-end: rgba(255, 241, 230, 0.04);
+}
+
+.gprdock-theme-poente .gprdock-widget:hover {
+    background-gradient-start: rgba(255, 159, 90, 0.22);
+    background-gradient-end: rgba(255, 159, 90, 0.08);
+}
+
+.gprdock-theme-neon .gprdock-widget {
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(0, 229, 255, 0.08);
+    background-gradient-end: rgba(255, 43, 214, 0.06);
+}
+
+.gprdock-theme-neon .gprdock-widget:hover {
+    background-gradient-start: rgba(0, 229, 255, 0.16);
+    background-gradient-end: rgba(255, 43, 214, 0.14);
+}
+
+.gprdock-theme-grafite .gprdock-widget {
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(255, 255, 255, 0.07);
+    background-gradient-end: rgba(255, 255, 255, 0.02);
+}
+
+.gprdock-theme-grafite .gprdock-widget:hover {
+    background-gradient-start: rgba(255, 255, 255, 0.12);
+    background-gradient-end: rgba(255, 255, 255, 0.05);
+}
+
+.gprdock-theme-papel .gprdock-widget {
+    background-gradient-direction: vertical;
+    background-gradient-start: #fffdf8;
+    background-gradient-end: #f6f1e6;
+}
+
+.gprdock-theme-papel .gprdock-widget:hover {
+    background-gradient-start: #ffffff;
+    background-gradient-end: #fbf6ec;
+}
+
+.gprdock-theme-menta .gprdock-widget {
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(255, 255, 255, 0.55);
+    background-gradient-end: rgba(28, 43, 36, 0.05);
+}
+
+.gprdock-theme-menta .gprdock-widget:hover {
+    background-gradient-start: rgba(255, 255, 255, 0.8);
+    background-gradient-end: rgba(28, 43, 36, 0.02);
+}
+
+/* Nos temas claros o chip precisa de mais cor para aparecer. */
+.gprdock-theme-papel .gprdock-tile-wide .gprdock-tile-icon,
+.gprdock-theme-menta .gprdock-tile-wide .gprdock-tile-icon {
+    icon-shadow: 0 0 0 transparent;
+}
+
+/* Separador e mascote não ganham fundo com os degradês acima. */
+.gprdock .gprdock-widget.gprdock-w-separator,
+.gprdock .gprdock-widget.gprdock-w-separator:hover,
+.gprdock .gprdock-widget.gprdock-w-mascot,
+.gprdock .gprdock-widget.gprdock-w-mascot:hover {
+    background-gradient-direction: none;
+}

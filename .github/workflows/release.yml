@@ -1,0 +1,69 @@
+# A cada push na main que mexe no empacotamento: se packaging/VERSION aponta
+# para uma versão ainda sem release, monta o .deb e publica a release; depois
+# refaz o repositório APT no GitHub Pages com todos os .deb já lançados.
+#
+# Um único gatilho de propósito: o Pages identifica a publicação pelo commit, e
+# duas execuções no mesmo commit (main + tag) faziam a segunda ser ignorada.
+name: release
+
+on:
+  push:
+    branches: [main]
+    paths: ['packaging/**', '.github/workflows/release.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ferramentas
+        run: sudo apt-get update && sudo apt-get install -y libglib2.0-bin dpkg-dev apt-utils gnupg
+
+      - name: Lançar a versão de packaging/VERSION, se for nova
+        run: |
+          version="$(cat packaging/VERSION)"
+          if gh release view "v$version" > /dev/null 2>&1; then
+            echo "v$version já foi lançada"
+          else
+            packaging/build-deb.sh "$version" dist
+            gh release create "v$version" dist/*.deb --generate-notes --target "$GITHUB_SHA"
+          fi
+
+      - name: Reunir todos os .deb lançados
+        run: |
+          mkdir -p debs
+          for tag in $(gh release list --limit 200 --json tagName --jq '.[].tagName'); do
+            gh release download "$tag" --pattern '*.deb' --dir debs --skip-existing || true
+          done
+          ls -l debs
+
+      - name: Montar e assinar o repositório APT
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
+          key="$(gpg --list-secret-keys --with-colons | awk -F: '$1 == "fpr" { print $10; exit }')"
+          packaging/build-repo.sh debs site "$key"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

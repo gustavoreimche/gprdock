@@ -1,0 +1,8 @@
+{
+  "uuid": "gprdock@gpr",
+  "name": "gprdock",
+  "description": "Dock flutuante com widgets vivos (música, calendário, clima, bateria, atividade, pomodoro e uso do Claude), inspirado no PrimoDock.",
+  "shell-version": ["50"],
+  "settings-schema": "org.gnome.shell.extensions.gprdock",
+  "version": 1
+}
