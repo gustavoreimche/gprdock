@@ -1217,6 +1217,14 @@ class SettingsPage {
         this._settings.bind('notification-badges', badges, 'active', Gio.SettingsBindFlags.DEFAULT);
         group.add(badges);
 
+        const webNotifications = new Adw.SwitchRow({
+            title: 'Notificações dos PWAs separadas',
+            subtitle: 'Avisos do WhatsApp, do Teams e de outros sites instalados como app saem em nome do app, e não do Chrome; mensagens da mesma conversa não se empilham',
+        });
+        this._settings.bind('web-notifications-by-app', webNotifications, 'active',
+            Gio.SettingsBindFlags.DEFAULT);
+        group.add(webNotifications);
+
         const labels = new Adw.SwitchRow({
             title: 'Nome ao passar o cursor',
             subtitle: 'O nome do app ou do widget aparece acima do dock',

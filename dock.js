@@ -16,6 +16,7 @@ import {
 } from './webApps.js';
 import {AppSpread} from './appSpread.js';
 import {Badges} from './badges.js';
+import {WebNotifications} from './webNotifications.js';
 import {GlassBackdrop, GlassStrip} from './glass.js';
 import {WindowPreview} from './windowPreview.js';
 import {
@@ -310,9 +311,11 @@ export class Dock {
             'changed::app-icons', () => this._appItems.forEach(item => item.appIcon.icon.update()),
             'changed::autohide', () => this._syncAutohide(),
             'changed::window-previews', () => this._syncExtras(),
-            'changed::notification-badges', () => this._syncExtras(), this);
+            'changed::notification-badges', () => this._syncExtras(),
+            'changed::web-notifications-by-app', () => this._syncExtras(), this);
         this._preview = null;
         this._badges = null;
+        this._webNotifications = null;
         this._syncExtras();
         Main.overview.connectObject(
             'showing', () => this._onHoverChanged(),
@@ -452,6 +455,14 @@ export class Dock {
             this._badges = null;
         }
         this._syncBadges();
+
+        const byApp = this.settings.get_boolean('web-notifications-by-app');
+        if (byApp && !this._webNotifications) {
+            this._webNotifications = new WebNotifications();
+        } else if (!byApp && this._webNotifications) {
+            this._webNotifications.destroy();
+            this._webNotifications = null;
+        }
     }
 
     _syncBadges() {
@@ -1431,6 +1442,8 @@ export class Dock {
         this._preview = null;
         this._badges?.destroy();
         this._badges = null;
+        this._webNotifications?.destroy();
+        this._webNotifications = null;
         this._clearItems();
         this._placeholder.destroy();
         this._separator?.destroy();

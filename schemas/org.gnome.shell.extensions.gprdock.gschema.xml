@@ -64,6 +64,10 @@
       <default>true</default>
       <summary>Mostrar no ícone quantos avisos o app tem pendentes</summary>
     </key>
+    <key name="web-notifications-by-app" type="b">
+      <default>true</default>
+      <summary>Notificações de sites com PWA (WhatsApp, Teams) saem em nome do PWA, sem fila</summary>
+    </key>
     <key name="hover-labels" type="b">
       <default>true</default>
       <summary>Mostrar o nome do app ou do widget ao passar o cursor</summary>
