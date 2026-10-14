@@ -5,7 +5,7 @@ import Secret from 'gi://Secret';
 import Soup from 'gi://Soup';
 import St from 'gi://St';
 
-import {Widget, httpGet, httpRequest, isCancelled} from './base.js';
+import {Widget, httpGet, httpRequest, isCancelled, timeLimit} from './base.js';
 import {Heatmap} from './gauges.js';
 import {PIPELINE_MARKS, announceFailures, fetchPipelines} from './pipelines.js';
 import {registerClass} from '../registerClass.js';
@@ -187,13 +187,15 @@ class GitWidget extends Widget {
 
     _token(account) {
         return new Promise((resolve, reject) => {
-            Secret.password_lookup(TOKEN_SCHEMA, {account: account.id}, this.cancellable,
+            const limit = timeLimit(this.cancellable);
+            Secret.password_lookup(TOKEN_SCHEMA, {account: account.id}, limit.cancellable,
                 (_source, result) => {
+                    limit.done();
                     try {
                         resolve(Secret.password_lookup_finish(result));
                     } catch (e) {
-                        reject(isCancelled(e) ? e
-                            : new AccountError('chaveiro do GNOME indisponível'));
+                        reject(isCancelled(e) && !limit.timedOut() ? e
+                            : new AccountError('chaveiro do GNOME indisponível', true));
                     }
                 });
         });

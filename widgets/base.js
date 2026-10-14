@@ -516,6 +516,36 @@ export function runCommand(argv, cancellable) {
     });
 }
 
+// Tempo máximo de uma consulta de rede ou do chaveiro. Sem ele, uma conexão
+// que nunca responde deixa o widget parado, mostrando dados velhos.
+export const REQUEST_TIMEOUT_SECONDS = 30;
+
+// Cancellable que também se cancela depois de `seconds`. `timedOut()` diz se
+// foi o tempo que estourou (e não o cancelamento do pai); `done()` solta o
+// timer e a ligação com o pai.
+export function timeLimit(parent, seconds = REQUEST_TIMEOUT_SECONDS) {
+    const cancellable = new Gio.Cancellable();
+    let expired = false;
+    const parentId = parent?.connect(() => cancellable.cancel()) ?? 0;
+    let timer = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, seconds, () => {
+        timer = 0;
+        expired = true;
+        cancellable.cancel();
+        return GLib.SOURCE_REMOVE;
+    });
+    return {
+        cancellable,
+        timedOut: () => expired,
+        done() {
+            if (timer)
+                GLib.source_remove(timer);
+            timer = 0;
+            if (parentId)
+                parent.disconnect(parentId);
+        },
+    };
+}
+
 // GET que devolve {status, text, headers}; rejeita só em falha de rede.
 export function httpGet(session, url, headers, cancellable) {
     return httpRequest(session, 'GET', url, headers, null, cancellable);
@@ -536,13 +566,21 @@ export function httpRequest(session, method, url, headers, json, cancellable) {
                 new GLib.Bytes(new TextEncoder().encode(JSON.stringify(json))));
         }
 
-        session.send_and_read_async(message, GLib.PRIORITY_DEFAULT, cancellable,
+        const limit = timeLimit(cancellable);
+        session.send_and_read_async(message, GLib.PRIORITY_DEFAULT, limit.cancellable,
             (source, result) => {
+                limit.done();
                 try {
                     let bytes = null;
                     try {
                         bytes = source.send_and_read_finish(result);
                     } catch (e) {
+                        if (limit.timedOut()) {
+                            source.abort();
+                            e = new Error('tempo esgotado');
+                            console.warn(`gprdock: ${url.split('?')[0]} não respondeu em ${REQUEST_TIMEOUT_SECONDS} s`);
+                            throw e;
+                        }
                         // Uma conexão guardada pode ter morrido (VPN que caiu
                         // e voltou): as próximas tentativas começam do zero.
                         if (!isCancelled(e)) {
