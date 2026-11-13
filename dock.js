@@ -109,6 +109,15 @@ const WIDGETS = {
 const GLASS_THEMES = new Set(['floating']);
 const GLASS_RADIUS = 16;        // o mesmo de .gprdock-panel-content
 const SETTLE_TIME = 700;        // ms que um app precisa ficar aberto para entrar no dock
+// Janelas que não são apps: sobreposições que o OpenLogi abre como janela
+// comum porque o GNOME não oferece camada própria (layer-shell). Um app só
+// com janelas destas não entra no dock.
+const OVERLAY_WM_CLASSES = new Set([
+    'openlogi-action-ring',
+    'openlogi-notice',
+    'openlogi-lock-key-osd',
+    'openlogi-backlight-osd',
+]);
 const SWIPE_DISTANCE = 48;      // px lógicos de arrasto para trocar de perfil
 const SCROLL_COOLDOWN = 350;    // ms entre trocas pela roda ou pelo touchpad
 const SCROLL_IDLE = 400;        // ms sem rolar para descartar o acumulado
@@ -149,7 +158,7 @@ class DockMenuManager extends PopupMenu.PopupMenuManager {
         const result = super._onCapturedEvent(actor, event);
         const target = global.stage.get_event_actor(event);
         if (type === Clutter.EventType.BUTTON_PRESS && !actor.contains(target))
-            this._onPressOutside(actor._delegate, target, event.get_button());
+            this._onPressOutside(actor._delegate, target, event);
         return result;
     }
 }
@@ -199,7 +208,7 @@ export class Dock {
         this._themedActors.add(this.actor);
 
         this.menuManager = new DockMenuManager(this.actor,
-            (menu, target, button) => this._onPressOutsideMenu(menu, target, button));
+            (menu, target, event) => this._onPressOutsideMenu(menu, target, event));
 
         this._dots = new St.BoxLayout({
             style_class: 'gprdock-dots',
@@ -573,7 +582,11 @@ export class Dock {
     // sem esta espera, cada uma faria o dock crescer e encolher.
     _settledApps() {
         const now = GLib.get_monotonic_time() / 1000;
-        const running = this._appSystem.get_running();
+        const running = this._appSystem.get_running().filter(app => {
+            const windows = app.get_windows();
+            return windows.length === 0 ||
+                !windows.every(w => OVERLAY_WM_CLASSES.has(w.get_wm_class()));
+        });
         const ids = new Set(running.map(app => app.get_id()));
         for (const id of this._firstSeen.keys()) {
             if (!ids.has(id))
@@ -1134,21 +1147,25 @@ export class Dock {
 
     // Clique fora do menu aberto (que já fechou). Em outro widget, vale como
     // clique nele; no mesmo que abriu o menu, só fecha.
-    _onPressOutsideMenu(menu, target, button) {
+    _onPressOutsideMenu(menu, target, event) {
         let widget = target;
         while (widget && !(widget.widgetName && widget.onSecondaryClick))
             widget = widget.get_parent();
         if (!widget || !this.actor.contains(widget))
             return;
 
+        // Os botões trocados de Widget: direito é onClick, do meio ou
+        // Ctrl+clique é onSecondaryClick, esquerdo é onMiddleClick.
         const own = menu.sourceActor === widget;
-        if (button === Clutter.BUTTON_PRIMARY) {
-            if (!own || menu === this._menu)
-                widget.onClick();
-        } else if (button === Clutter.BUTTON_SECONDARY) {
+        const button = event.get_button();
+        const ctrl = (event.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
+        if (button === Clutter.BUTTON_MIDDLE || (button === Clutter.BUTTON_PRIMARY && ctrl)) {
             if (!own || menu !== this._menu)
                 widget.onSecondaryClick();
-        } else if (button === Clutter.BUTTON_MIDDLE) {
+        } else if (button === Clutter.BUTTON_SECONDARY) {
+            if (!own || menu === this._menu)
+                widget.onClick();
+        } else if (button === Clutter.BUTTON_PRIMARY) {
             widget.onMiddleClick();
         }
     }

@@ -15,7 +15,7 @@ const startOfDay = date => new Date(date.getFullYear(), date.getMonth(), date.ge
 // O compromisso que vem a seguir, com quanto falta. Usa a mesma agenda que o
 // GNOME mostra ao clicar no relógio (as contas de Configurações › Contas
 // Online); ela só entrega horário e título, então o link da reunião não vem:
-// o clique do meio abre o Teams, ou a Agenda se ele não estiver instalado.
+// o clique esquerdo abre o Teams, ou a Agenda se ele não estiver instalado.
 export const MeetingWidget = registerClass(
 class MeetingWidget extends Widget {
     setup() {
@@ -66,7 +66,7 @@ class MeetingWidget extends Widget {
     onMiddleClick() {
         const teams = this._teams();
         if (teams) {
-            teams.activate();
+            this.activateApp(teams);
             return true;
         }
         return this.launchApp('org.gnome.Calendar.desktop');

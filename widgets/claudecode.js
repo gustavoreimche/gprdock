@@ -137,7 +137,7 @@ class ClaudeCodeWidget extends Widget {
 
     onMiddleClick() {
         const session = this._sessions.find(s => s.window);
-        if (session)
+        if (session && !this.minimizeIfFocused([session.window]))
             Main.activateWindow(session.window);
         return Boolean(session);
     }

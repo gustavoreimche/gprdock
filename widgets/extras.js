@@ -377,7 +377,7 @@ class VoiceMemoWidget extends Widget {
     }
 
     onSecondaryClick() {
-        // Gravando, o clique direito também só para: o menu ficaria por cima.
+        // Gravando, o clique do meio também só para: o menu ficaria por cima.
         if (this._recording)
             this._stop();
         else

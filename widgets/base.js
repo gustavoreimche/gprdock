@@ -32,7 +32,8 @@ const PULSING = ['gprdock-state-alert', 'gprdock-ai-attention', 'gprdock-state-w
 // sobrescreve build(size) e refresh().
 //
 // Ciclo de vida para as subclasses: setup() (uma vez), build()/refresh() (a
-// cada troca de forma), onClick()/onSecondaryClick(), onDestroy().
+// cada troca de forma), onClick() (clique direito), onMiddleClick() (clique
+// esquerdo), onSecondaryClick() (clique do meio ou Ctrl+clique), onDestroy().
 export const Widget = registerClass(
 class Widget extends St.Button {
     _init(dock, name) {
@@ -55,22 +56,33 @@ class Widget extends St.Button {
         this._tile = null;
         this.cancellable = new Gio.Cancellable();
 
-        this.connect('clicked', () => this.onClick());
+        // Botões trocados em relação ao costume: o esquerdo abre o programa
+        // ou a página do widget (onMiddleClick), o direito faz a ação dele
+        // (onClick) e o do meio ou Ctrl+clique abre as opções
+        // (onSecondaryClick). Os nomes dos ganchos ficaram os de antes.
+        this.connect('clicked', () => {
+            const event = Clutter.get_current_event();
+            if (event && (event.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0)
+                this.onSecondaryClick();
+            else
+                this.onMiddleClick();
+        });
         // Com o cursor em cima o widget sobe um pouco.
         this.track_hover = true;
         this.connect('notify::hover', () => this._onHover());
         // Estados de alerta (ver PULSING) fazem o brilho atrás do tile respirar.
         this.connect('notify::style-class', () => this._syncPulse());
-        // O clique direito é tratado já no pressionar e não segue adiante:
-        // se chegasse ao dock, abriria o menu dele por cima do widget.
-        // O do meio abre o programa ou a página a que o widget se refere.
+        // Os cliques direito e do meio são tratados já no pressionar e não
+        // seguem adiante: se chegassem ao dock, abririam o menu dele por cima
+        // do widget.
         this.connect('button-press-event', (_actor, event) => {
             const button = event.get_button();
-            if (button === Clutter.BUTTON_MIDDLE)
-                return this.onMiddleClick() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
-            if (button !== Clutter.BUTTON_SECONDARY)
+            if (button === Clutter.BUTTON_SECONDARY)
+                this.onClick();
+            else if (button === Clutter.BUTTON_MIDDLE)
+                this.onSecondaryClick();
+            else
                 return Clutter.EVENT_PROPAGATE;
-            this.onSecondaryClick();
             return Clutter.EVENT_STOP;
         });
         this.connect('destroy', () => this._cleanup());
@@ -341,8 +353,26 @@ class Widget extends St.Button {
     launchApp(...ids) {
         const appSystem = Shell.AppSystem.get_default();
         const app = ids.map(id => appSystem.lookup_app(id)).find(Boolean);
-        app?.activate();
+        if (app)
+            this.activateApp(app);
         return Boolean(app);
+    }
+
+    // Traz o app para a frente; se ele já está em foco, o clique de novo o
+    // minimiza, como no ícone de um app do dock.
+    activateApp(app) {
+        if (this.minimizeIfFocused(app.get_windows()))
+            return;
+        app.activate();
+    }
+
+    // Minimiza estas janelas se uma delas está em foco. Devolve se minimizou.
+    minimizeIfFocused(windows) {
+        windows = windows.filter(w => !w.skip_taskbar);
+        if (!windows.includes(global.display.focus_window))
+            return false;
+        windows.forEach(w => w.minimize());
+        return true;
     }
 
     // Repete fn a cada `seconds`; o timer morre junto com o widget.

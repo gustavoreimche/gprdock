@@ -150,12 +150,12 @@ o código, feche a janela e rode de novo.
 | Trocar tema | Configurações › Perfis |
 | Tudo o mais | "Configurações…": nome e itens de cada perfil, tamanho, cidade do clima, pomodoro, clique em app com várias janelas |
 
-| Widget | Clique | Clique direito |
+| Widget | Clique direito | Clique do meio ou Ctrl+clique |
 |---|---|---|
 | Música | Traz a janela do player; botões controlam a faixa | Opções do widget |
 | Calendário | Abre o calendário do painel do topo | Opções do widget |
 | Clima, bateria, Claude | Abre o painel de detalhes | Opções do widget |
-| Atividade | Abre o monitor do sistema | Opções do widget |
+| Atividade | Abre os detalhes: núcleos, memória, GPU, disco, rede e os processos que mais gastam processador e memória, com encerrar e forçar | Opções do widget |
 | Pomodoro | Inicia / pausa | Zera e volta ao foco |
 | Jarvis | Faz ouvir, ou interrompe se estiver ouvindo/falando | Abre o painel web |
 | Timer, cronômetro | Inicia / pausa | Zera |
@@ -173,15 +173,17 @@ o código, feche a janela e rode de novo.
 | Armazenamento | Abre o uso de cada disco; clicar num abre a pasta | Opções do widget |
 | Relógio mundial | Abre a hora nas cidades escolhidas em Configurações › Ajustes | Opções do widget |
 | Gravador de voz | Começa e para a gravação do microfone (fica em Música/Gravações de voz) | Últimas gravações e a pasta |
-| Saída de som | Abre a lista de saídas para trocar; clique do meio silencia | Opções do widget |
+| Saída de som | Abre a lista de saídas para trocar; clique esquerdo silencia | Opções do widget |
 | Microfone | Liga e desliga o microfone | Opções do widget e escolha da entrada |
 | Não perturbe | Liga e desliga as notificações na tela | Opções do widget e "iniciar o pomodoro junto" |
 | Portas em uso | Abre a lista de portas com processo seu: abrir no navegador, copiar, encerrar | Opções do widget |
 
-**Clique do meio** num widget abre o programa ou a página a que ele se refere:
+**Clique** (esquerdo) num widget abre o programa ou a página a que ele se
+refere; nos que não têm um, não faz nada. Os que têm:
 Git (pedidos de revisão da conta), versículo
 (BibleGateway), Claude (página de uso), Jarvis (painel web), música (o player),
-calendário, clima, relógio, atividade, bateria e rede (os apps do GNOME),
+clima (a previsão da cidade no Google), calendário, relógio, bateria e
+rede (os apps do GNOME), atividade (o monitor do sistema),
 Downloads e capturas (a pasta).
 
 Favoritos, atalhos e coleções são criados em Configurações › Conteúdo. Cada
@@ -194,11 +196,11 @@ Também dá para guardar o que estiver copiado no Arquivos. Para usar, "Copiar"
 (ou "Copiar tudo") e cole no destino: o GNOME Shell não consegue iniciar um
 arrasto para dentro de um app.
 
-**Mascote**: gato, cachorro, coelho ou passarinho (clique direito no widget), passeando
+**Mascote**: gato, cachorro, coelho ou passarinho (clique do meio no widget), passeando
 em cima do dock (sem ocupar lugar nele) ou parado no tile. Segue o cursor com os olhos, dorme depois de um minuto e meio sem
-teclado nem mouse, sua quando o processador passa de 85% e faz festa no clique.
+teclado nem mouse, sua quando o processador passa de 85% e faz festa no clique direito.
 
-Nos widgets em que o clique direito não tem outra função, ele abre as opções
+Nos widgets em que o clique do meio não tem outra função, ele (ou Ctrl+clique) abre as opções
 do próprio widget: forma e esconder. O menu do dock (perfis, galeria de
 widgets e configurações) fica no clique direito do ícone de apps.
 

@@ -481,7 +481,7 @@ class StreamWatch {
 }
 
 // Por onde o som sai: o painel troca entre caixa, fone, HDMI e Bluetooth.
-// Clique do meio silencia.
+// Clique (esquerdo) silencia.
 export const AudioWidget = registerClass(
 class AudioWidget extends Widget {
     setup() {
@@ -548,8 +548,8 @@ class AudioWidget extends Widget {
     }
 });
 
-// O microfone: um clique liga e desliga. A entrada em uso se escolhe pelo
-// clique direito.
+// O microfone: um clique direito liga e desliga. A entrada em uso se escolhe pelo
+// clique do meio.
 export const MicWidget = registerClass(
 class MicWidget extends Widget {
     setup() {

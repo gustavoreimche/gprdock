@@ -22,8 +22,8 @@ const STATES = {
 const BUSY = new Set(['listening', 'thinking', 'speaking']);
 
 // Estado ao vivo do Jarvis (assistente de voz local), pelo WebSocket dele.
-// Clique: começa a ouvir, ou interrompe se ele estiver ouvindo/pensando/
-// falando. Clique direito: abre o painel web.
+// Clique direito: começa a ouvir, ou interrompe se ele estiver ouvindo/pensando/
+// falando. Clique do meio: abre o painel web.
 export const JarvisWidget = registerClass(
 class JarvisWidget extends Widget {
     onMiddleClick() {

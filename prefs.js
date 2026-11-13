@@ -1066,7 +1066,7 @@ class SettingsPage {
     _buildOtherWidgets() {
         const timer = new Adw.PreferencesGroup({
             title: 'Timer e cronômetro',
-            description: 'No dock: clique inicia ou pausa, clique direito zera',
+            description: 'No dock: clique direito inicia ou pausa, clique do meio zera',
         });
         timer.add(this._spin('timer-minutes', 'Duração do timer', 'Minutos', 1, 600));
         this.page.add(timer);
@@ -1080,7 +1080,7 @@ class SettingsPage {
 
         const water = new Adw.PreferencesGroup({
             title: 'Beber água',
-            description: 'No dock: clique soma um copo, clique direito tira um',
+            description: 'No dock: clique direito soma um copo, clique do meio tira um',
         });
         water.add(this._spin('water-goal', 'Meta do dia', 'Copos', 1, 30));
         this.page.add(water);
@@ -1339,7 +1339,7 @@ class SettingsPage {
     _buildJarvis() {
         const group = new Adw.PreferencesGroup({
             title: 'Jarvis',
-            description: 'No dock: clique faz ouvir (ou interrompe), clique direito abre o painel',
+            description: 'No dock: clique direito faz ouvir (ou interrompe), clique do meio abre o painel',
         });
         const url = new Adw.EntryRow({
             title: 'Endereço',
@@ -1435,7 +1435,7 @@ class SettingsPage {
     _buildPomodoro() {
         const group = new Adw.PreferencesGroup({
             title: 'Pomodoro',
-            description: 'No dock: clique inicia ou pausa, clique direito zera a contagem',
+            description: 'No dock: clique direito inicia ou pausa, clique do meio zera a contagem',
         });
         group.add(this._spin('pomodoro-focus-minutes', 'Foco', 'Minutos', 1, 180));
         group.add(this._spin('pomodoro-short-minutes', 'Pausa curta', 'Minutos', 1, 60));

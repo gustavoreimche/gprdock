@@ -11,8 +11,10 @@ import {customGicon} from './iconLibrary.js';
 import {registerClass} from './registerClass.js';
 import {isIsolatedCopy, isSingleWindowWebApp, isWebApp} from './webApps.js';
 
-const HOVER_SCALE = 1.14;
-const HOVER_TIME = 120;
+const HOVER_SCALE = 1.12;
+const PRESS_SCALE = 0.94;
+const HOVER_LIFT = 4;           // px lógicos
+const HOVER_TIME = 220;
 const MAX_WINDOW_DOTS = 4;
 const BOUNCE_HEIGHT = 9;        // px lógicos
 const BOUNCE_TIME = 220;
@@ -331,21 +333,35 @@ export function createAppItem(app, settings, appSpread, webApps) {
         }
     };
 
-    icon.connect('notify::hover', () => {
+    // Sem fundo de destaque: o ícone sobe e cresce um pouco, com um leve
+    // quique, e afunda ao ser apertado. Enquanto o app abre, o pulinho manda
+    // na altura.
+    const animate = () => {
         const hover = icon.hover;
-        if (hover && settings.get_boolean('hover-labels'))
+        const pressed = hover && icon.pressed;
+        const scale = pressed ? PRESS_SCALE : hover ? HOVER_SCALE : 1;
+        const params = {
+            scale_x: scale,
+            scale_y: scale,
+            duration: pressed ? HOVER_TIME / 2 : HOVER_TIME,
+            mode: hover && !pressed ? Clutter.AnimationMode.EASE_OUT_BACK
+                : Clutter.AnimationMode.EASE_OUT_QUAD,
+        };
+        if (app.state !== Shell.AppState.STARTING) {
+            const lift = HOVER_LIFT * St.ThemeContext.get_for_stage(global.stage).scale_factor;
+            params.translation_y = hover && !pressed ? -lift : 0;
+        }
+        icon.icon.ease(params);
+    };
+
+    icon.connect('notify::hover', () => {
+        if (icon.hover && settings.get_boolean('hover-labels'))
             item.showLabel();
         else
             item.hideLabel();
-
-        const scale = hover ? HOVER_SCALE : 1;
-        icon.icon.ease({
-            scale_x: scale,
-            scale_y: scale,
-            duration: HOVER_TIME,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-        });
+        animate();
     });
+    icon.connect('notify::pressed', animate);
 
     return item;
 }

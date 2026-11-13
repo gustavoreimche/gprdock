@@ -99,12 +99,14 @@ class ShortcutsWidget extends Widget {
         }
     }
 
-    onClick() {
+    // Clique esquerdo: dispara o atalho, ou abre a lista quando há vários.
+    onMiddleClick() {
         const shortcuts = this._shortcuts();
         if (shortcuts.length === 1)
             this._run(shortcuts[0]);
         else
             this._panel.toggle();
+        return true;
     }
 
     onDestroy() {

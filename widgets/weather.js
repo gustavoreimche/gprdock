@@ -31,8 +31,11 @@ function condition(code, isDay = true) {
 
 export const WeatherWidget = registerClass(
 class WeatherWidget extends Widget {
+    // A previsão da cidade escolhida no buscador: serve para qualquer cidade,
+    // sem depender de um id do site de clima.
     onMiddleClick() {
-        return this.launchApp('org.gnome.Weather.desktop');
+        const city = this._settings.get_string('weather-city');
+        return this.openUri(`https://www.google.com/search?q=${encodeURIComponent(`previsão do tempo ${city}`.trim())}`);
     }
 
     setup() {

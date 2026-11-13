@@ -152,7 +152,7 @@ class NoteWidget extends Widget {
     }
 });
 
-// Copos de água do dia. Clique soma um; clique direito tira um.
+// Copos de água do dia. Clique direito soma um; clique do meio tira um.
 export const WaterWidget = registerClass(
 class WaterWidget extends Widget {
     setup() {

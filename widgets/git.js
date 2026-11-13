@@ -5,7 +5,7 @@ import Secret from 'gi://Secret';
 import Soup from 'gi://Soup';
 import St from 'gi://St';
 
-import {Widget, httpGet, httpRequest, isCancelled, timeLimit} from './base.js';
+import {Widget, httpRequest, isCancelled, timeLimit} from './base.js';
 import {Heatmap} from './gauges.js';
 import {PIPELINE_MARKS, announceFailures, fetchPipelines} from './pipelines.js';
 import {registerClass} from '../registerClass.js';
@@ -72,6 +72,15 @@ function baseUrl(host, fallback) {
     return /^https?:\/\//.test(host) ? host : `https://${host}`;
 }
 
+// Página de merge requests no site. O gitlab.com tem um painel próprio, que
+// já separa os seus dos que esperam revisão e não aceita filtro no endereço;
+// nos servidores próprios vai o filtro (`author_username=...`).
+function gitlabMergeRequestsUrl(host, filter) {
+    return /\/\/(www\.)?gitlab\.com$/.test(host)
+        ? `${host}/dashboard/merge_requests/`
+        : `${host}/dashboard/merge_requests?scope=all&state=opened${filter ? `&${filter}` : ''}`;
+}
+
 // `transient`: falha que pode passar sozinha, e vale tentar de novo logo.
 class AccountError extends Error {
     constructor(message, transient = false) {
@@ -88,7 +97,7 @@ class AccountError extends Error {
 export const GitWidget = registerClass(
 class GitWidget extends Widget {
     setup() {
-        this._session = new Soup.Session({timeout: 20, user_agent: 'gprdock'});
+        this._newSession();
         this._icon = new Gio.FileIcon({file: Gio.File.new_for_path(
             GLib.build_filenamev([this._dock.path, 'icons', 'git-symbolic.svg']))});
         this._results = [];
@@ -146,15 +155,16 @@ class GitWidget extends Widget {
         return `Git: ${account?.name || account?.host || 'conta removida'}`;
     }
 
-    // Abre os pedidos de revisão da primeira conta deste widget.
+    // Abre os seus pedidos abertos na primeira conta deste widget.
     onMiddleClick() {
         const account = parseAccounts(this._settings.get_string('git-accounts'))
             .find(a => this._inProfile(a.id));
         if (!account)
             return false;
-        return this.openUri(account.type === 'github'
+        const known = this._results.find(r => r.id === account.id && !r.error);
+        return this.openUri(known?.mine.url ?? (account.type === 'github'
             ? `${baseUrl(account.host, 'github.com')}/pulls`
-            : `${baseUrl(account.host, 'gitlab.com')}/dashboard/merge_requests`);
+            : gitlabMergeRequestsUrl(baseUrl(account.host, 'gitlab.com'), null)));
     }
 
     // O widget 'git@<conta>' mostra só aquela conta. O widget geral mostra as
@@ -164,6 +174,13 @@ class GitWidget extends Widget {
             return accountId === this.widgetParam;
         const chosen = this._dock.profiles.current.gitAccounts;
         return !Array.isArray(chosen) || chosen.length === 0 || chosen.includes(accountId);
+    }
+
+    // As contas a consultar: o widget de uma conta só não consulta as outras,
+    // que já têm quem as consulte (e o gitlab.com limita as consultas por IP).
+    _accounts() {
+        return parseAccounts(this._settings.get_string('git-accounts'))
+            .filter(a => !this.widgetParam || a.id === this.widgetParam);
     }
 
     // O dock avisa quando o perfil em uso muda.
@@ -201,10 +218,28 @@ class GitWidget extends Widget {
         });
     }
 
+    // A sessão guarda o endereço IP de cada servidor e não o resolve de
+    // novo: quando a VPN sobe ou muda, o IP certo passa a ser outro e a
+    // sessão velha segue tentando o antigo ("sem rota para o host"). Depois
+    // de uma falha de rede, uma sessão nova resolve tudo do zero.
+    _newSession() {
+        this._session = new Soup.Session({timeout: 20, user_agent: 'gprdock'});
+    }
+
+    async _request(method, url, headers, json = null) {
+        try {
+            return await httpRequest(this._session, method, url, headers, json, this.cancellable);
+        } catch (e) {
+            if (!isCancelled(e))
+                this._newSession();
+            throw e;
+        }
+    }
+
     async _json(url, headers) {
         let response = null;
         try {
-            response = await httpGet(this._session, url, headers, this.cancellable);
+            response = await this._request('GET', url, headers);
         } catch (e) {
             throw isCancelled(e) ? e : new AccountError('sem conexão com o servidor', true);
         }
@@ -278,7 +313,7 @@ class GitWidget extends Widget {
             return {
                 count: Number(responseHeaders.get_one('x-total') ?? data.length),
                 items: data.map(i => ({title: i.title, url: i.web_url, target: i.target_branch})),
-                url: `${host}/dashboard/merge_requests?state=opened&${filter}`,
+                url: gitlabMergeRequestsUrl(host, filter),
             };
         };
         const [user] = await this._json(`${api}/user`, headers);
@@ -295,8 +330,8 @@ class GitWidget extends Widget {
         const host = baseUrl(account.host, 'github.com');
         const url = /\/\/(www\.)?github\.com$/.test(host)
             ? 'https://api.github.com/graphql' : `${host}/api/graphql`;
-        const response = await httpRequest(this._session, 'POST', url,
-            {'Authorization': `Bearer ${token}`}, {query: CONTRIBUTIONS_QUERY}, this.cancellable);
+        const response = await this._request('POST', url,
+            {'Authorization': `Bearer ${token}`}, {query: CONTRIBUTIONS_QUERY});
         if (response.status !== 200)
             return {};
 
@@ -318,9 +353,9 @@ class GitWidget extends Widget {
         const api = `${host}/api/v4`;
         try {
             const [user] = await this._json(`${api}/user`, {'PRIVATE-TOKEN': token});
-            const response = await httpGet(this._session,
+            const response = await this._request('GET',
                 `${host}/users/${encodeURIComponent(user.username)}/calendar.json`,
-                {'PRIVATE-TOKEN': token}, this.cancellable);
+                {'PRIVATE-TOKEN': token});
             const calendar = response.status === 200 ? JSON.parse(response.text) : null;
             if (calendar && Object.keys(calendar).length > 0) {
                 this._eventSync.delete(account.id);
@@ -437,7 +472,7 @@ class GitWidget extends Widget {
 
     async _fetchActivity() {
         const run = this._activityRun = (this._activityRun ?? 0) + 1;
-        const accounts = parseAccounts(this._settings.get_string('git-accounts'));
+        const accounts = this._accounts();
         const activity = new Map();
         let failed = false;
         this._backfilling = false;
@@ -510,7 +545,7 @@ class GitWidget extends Widget {
     // mais nova ter começado; nesse caso o resultado dela é descartado.
     async _fetch() {
         const run = this._fetchRun = (this._fetchRun ?? 0) + 1;
-        const accounts = parseAccounts(this._settings.get_string('git-accounts'));
+        const accounts = this._accounts();
         try {
             const results = await Promise.all(accounts.map(a => this._fetchAccount(a)));
             if (run !== this._fetchRun)

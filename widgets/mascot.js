@@ -818,7 +818,7 @@ class MascotWidget extends Widget {
         this._value.text = value;
     }
 
-    // Opções a mais no menu do clique direito.
+    // Opções a mais no menu do clique do meio.
     buildMenu(menu) {
         menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem('Bicho'));
         for (const [id, label] of MASCOTS) {
@@ -934,9 +934,13 @@ class MascotWidget extends Widget {
         if (!this._walker) {
             const walker = this._walker = new MascotArt({reactive: true});
             walker.connect('button-press-event', (_actor, event) => {
-                if (event.get_button() === Clutter.BUTTON_SECONDARY)
+                // Como no tile (ver Widget): o do meio ou Ctrl+clique abre
+                // as opções, o direito faz festa e o esquerdo não faz nada.
+                const button = event.get_button();
+                const ctrl = (event.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
+                if (button === Clutter.BUTTON_MIDDLE || (button === Clutter.BUTTON_PRIMARY && ctrl))
                     this._dock.openMenu(this, walker);
-                else
+                else if (button === Clutter.BUTTON_SECONDARY)
                     this.onClick();
                 return Clutter.EVENT_STOP;
             });

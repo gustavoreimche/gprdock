@@ -13,7 +13,7 @@ const PHASES = {
 const now = () => Math.floor(Date.now() / 1000);
 const today = () => new Date().toLocaleDateString('sv-SE');
 
-// Clique inicia ou pausa; clique direito zera e volta ao foco.
+// Clique direito inicia ou pausa; clique do meio zera e volta ao foco.
 export const PomodoroWidget = registerClass(
 class PomodoroWidget extends Widget {
     setup() {

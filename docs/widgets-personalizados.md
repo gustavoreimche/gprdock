@@ -75,7 +75,7 @@ echo "Atualizado às $(date +%H:%M)"   # demais linhas: o painel do clique
 | `command` | um dos três | Em vez de um arquivo: uma lista (`["uptime", "-p"]`) ou um texto, que roda no `bash`. |
 | `module` | um dos três | Arquivo `.js` (ver "Widget de módulo"). |
 | `interval` | não | Segundos entre uma execução e outra. Padrão 60, mínimo 1. |
-| `click`, `middleClick` | não | O que o clique faz (ver "Ações"). O padrão do clique é abrir o painel. |
+| `click`, `middleClick` | não | O que o clique direito (`click`) e o esquerdo (`middleClick`) fazem (ver "Ações"). O padrão do direito é abrir o painel; o esquerdo, sem ação, não faz nada. |
 | `wmClasses` | não | Classes de janela de um app que este widget representa: com o widget no perfil, o ícone do app aberto não aparece em dobro. |
 
 O script roda com a pasta do widget como diretório atual e recebe:
@@ -127,7 +127,7 @@ escreva um objeto JSON:
 | `ringText` | Texto dentro do anel. |
 | `state` | `"warn"` (âmbar) ou `"alert"` (vermelho): o tile muda de cor e pulsa. |
 | `lines` | Linhas do painel: textos, ou objetos com `text`, `title` e uma ação. |
-| `click` | Troca a ação do clique a partir desta execução. |
+| `click` | Troca a ação do clique direito a partir desta execução. |
 
 ### Ações
 
@@ -136,7 +136,7 @@ linha do painel:
 
 | Ação | Efeito |
 |---|---|
-| `"panel"` | Abre o painel (o padrão do clique). |
+| `"panel"` | Abre o painel (o padrão do clique direito). |
 | `{"open": "https://..."}` | Abre um endereço ou arquivo no app padrão. |
 | `{"app": "org.gnome.Calculator.desktop"}` | Abre (ou traz para a frente) um app. |
 | `{"run": ["comando", "arg"]}` | Roda um comando na pasta do widget e, em seguida, o script de novo. |
@@ -206,12 +206,12 @@ funções da classe passam a ser as do widget: dentro delas, `this` é o widget.
 | Função | Quando é chamada |
 |---|---|
 | `setup()` | Uma vez, ao carregar. |
-| `onClick()` | Clique. Sem ela, o clique abre o painel. |
-| `onMiddleClick()` | Clique do meio. Devolva `true` se fez algo. |
-| `onSecondaryClick()` | Clique direito. Sem ela, abre o menu do dock para o widget. |
+| `onClick()` | Clique direito. Sem ela, abre o painel. |
+| `onMiddleClick()` | Clique esquerdo: abre o programa ou a página do widget. Sem ela, não faz nada. Devolva `true` se fez algo. |
+| `onSecondaryClick()` | Clique do meio ou Ctrl+clique. Sem ela, abre o menu do dock para o widget. |
 | `onDestroy()` | Ao remover, recarregar ou desligar o dock. Desfaça aqui o que conectou. |
 | `build(size)`, `refresh()` | Só para quem desenha o próprio tile (veja `widgets/base.js`). |
-| `get title()` | Nome no menu do clique direito. |
+| `get title()` | Nome no menu do clique do meio. |
 
 ### O que o widget oferece (`this`)
 
@@ -220,7 +220,7 @@ funções da classe passam a ser as do widget: dentro delas, `this` é o widget.
 | `this.display({icon, gicon, value, short, caption, ring, ringText})` | Mostra no tile. Os mesmos campos da saída em JSON. |
 | `this.every(segundos, fn)` | Repete `fn`; o timer morre com o widget. Devolve um id para `this.cancelTimer(id)`. |
 | `this.createPanel({wide})` | Cria o painel do clique. |
-| `this.setPanelLines([[texto, classe, ação], ...])` | Preenche o painel. A classe `gprdock-panel-title` é a de título. |
+| `this.setPanelLines([[texto, classe, ação], ...])` | Preenche o painel. A classe `gprdock-panel-title` é a de título; `gprdock-panel-group`, a de cabeçalho de um grupo de linhas. |
 | `this.launchApp('x.desktop', ...)` | Abre o primeiro app instalado da lista. |
 | `this.openUri(endereço)` | Abre no app padrão. |
 | `this.add_style_class_name('gprdock-state-warn')` | Estado de atenção (`-warn`) ou alerta (`-alert`). |

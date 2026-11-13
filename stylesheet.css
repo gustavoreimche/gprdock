@@ -52,9 +52,36 @@
     background-color: transparent;
 }
 
+/* Ícone de app não ganha fundo ao passar o cursor: muitos (PWAs, ícones
+   redondos) já ocupam o quadrado inteiro, e o fundo virava uma moldura cinza
+   colada neles. O retorno é o próprio ícone subindo (appIcons.js). O
+   !important tira também o anel de foco do GNOME, que fica depois do clique. */
+.gprdock .overview-tile:hover,
+.gprdock .overview-tile:focus,
+.gprdock .overview-tile:active,
+.gprdock .overview-tile:checked {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
 .gprdock .overview-tile .overview-icon {
     padding: 0;
     spacing: 0;
+}
+
+/* Outras extensões (ex.: Blur my Shell) pintam um fundo quadrado na camada
+   de dentro do ícone ao passar o cursor; no dock o ícone fica limpo.
+   As classes repetidas só aumentam a especificidade, para ganhar das regras
+   !important delas sem depender da ordem em que as folhas carregam. */
+.gprdock.gprdock .overview-tile.overview-tile .overview-icon.overview-icon,
+.gprdock.gprdock .overview-tile.overview-tile:hover .overview-icon.overview-icon,
+.gprdock.gprdock .overview-tile.overview-tile:focus .overview-icon.overview-icon,
+.gprdock.gprdock .overview-tile.overview-tile:active .overview-icon.overview-icon,
+.gprdock.gprdock .overview-tile.overview-tile:checked .overview-icon.overview-icon {
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
 }
 
 .gprdock-window-dots {
@@ -344,6 +371,13 @@
     font-size: 12px;
 }
 
+/* Cabeçalho de um grupo dentro do painel (ex.: o workspace das sessões) */
+.gprdock-panel-group {
+    font-weight: bold;
+    font-size: 11px;
+    opacity: 0.6;
+}
+
 /* Prateleira: durante um arrasto vindo de um app */
 .gprdock .gprdock-widget.gprdock-shelf-ready {
     border-color: rgba(128, 128, 128, 0.8);
@@ -450,7 +484,6 @@
 .gprdock-preview-close:hover {
     background-color: rgba(255, 92, 92, 0.75);
 }
-
 
 /* ---------- Acabamento comum ---------- */
 
@@ -790,11 +823,6 @@
     color: #f2f2f5;
 }
 
-.gprdock-theme-vidro .overview-tile:hover,
-.gprdock-theme-vidro .overview-tile:focus {
-    background-color: rgba(255, 255, 255, 0.12);
-}
-
 .gprdock-theme-vidro .gprdock-drop-placeholder {
     background-color: #5aa9ff;
 }
@@ -884,11 +912,6 @@
     border-color: #d8cfbc;
     box-shadow: 0 4px 14px rgba(60, 45, 20, 0.28);
     color: #2b2824;
-}
-
-.gprdock-theme-papel .overview-tile:hover,
-.gprdock-theme-papel .overview-tile:focus {
-    background-color: rgba(60, 45, 20, 0.1);
 }
 
 .gprdock-theme-papel .gprdock-drop-placeholder {
@@ -981,11 +1004,6 @@
     border-color: #00e5ff;
     box-shadow: 0 0 16px rgba(0, 229, 255, 0.6);
     color: #e8fbff;
-}
-
-.gprdock-theme-neon .overview-tile:hover,
-.gprdock-theme-neon .overview-tile:focus {
-    background-color: rgba(0, 229, 255, 0.16);
 }
 
 .gprdock-theme-neon .gprdock-drop-placeholder {
@@ -1097,8 +1115,6 @@
     background-color: #ffffff;
 }
 
-.gprdock-theme-floating .overview-tile:hover,
-.gprdock-theme-floating .overview-tile:focus,
 .gprdock-theme-floating .gprdock-show-apps:hover,
 .gprdock-theme-floating .gprdock-show-apps:focus {
     background-color: rgba(255, 255, 255, 0.14);
@@ -1207,8 +1223,6 @@
     color: #eceff4;
 }
 
-.gprdock-theme-nord .overview-tile:hover,
-.gprdock-theme-nord .overview-tile:focus,
 .gprdock-theme-nord .gprdock-show-apps:hover,
 .gprdock-theme-nord .gprdock-show-apps:focus,
 .gprdock-theme-nord .gprdock-music-button:hover {
@@ -1285,8 +1299,6 @@
     color: #f8f8f2;
 }
 
-.gprdock-theme-dracula .overview-tile:hover,
-.gprdock-theme-dracula .overview-tile:focus,
 .gprdock-theme-dracula .gprdock-show-apps:hover,
 .gprdock-theme-dracula .gprdock-show-apps:focus,
 .gprdock-theme-dracula .gprdock-music-button:hover {
@@ -1363,8 +1375,6 @@
     color: #fff1e6;
 }
 
-.gprdock-theme-poente .overview-tile:hover,
-.gprdock-theme-poente .overview-tile:focus,
 .gprdock-theme-poente .gprdock-show-apps:hover,
 .gprdock-theme-poente .gprdock-show-apps:focus,
 .gprdock-theme-poente .gprdock-music-button:hover {
@@ -1441,8 +1451,6 @@
     color: #e6e6e6;
 }
 
-.gprdock-theme-grafite .overview-tile:hover,
-.gprdock-theme-grafite .overview-tile:focus,
 .gprdock-theme-grafite .gprdock-show-apps:hover,
 .gprdock-theme-grafite .gprdock-show-apps:focus,
 .gprdock-theme-grafite .gprdock-music-button:hover {
@@ -1519,8 +1527,6 @@
     color: #1c2b24;
 }
 
-.gprdock-theme-menta .overview-tile:hover,
-.gprdock-theme-menta .overview-tile:focus,
 .gprdock-theme-menta .gprdock-show-apps:hover,
 .gprdock-theme-menta .gprdock-show-apps:focus,
 .gprdock-theme-menta .gprdock-music-button:hover {

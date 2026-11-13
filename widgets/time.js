@@ -127,7 +127,7 @@ class CountdownWidget extends Widget {
     }
 });
 
-// Clique inicia ou pausa; clique direito zera.
+// Clique direito inicia ou pausa; clique do meio zera.
 export const StopwatchWidget = registerClass(
 class StopwatchWidget extends Widget {
     onMiddleClick() {
@@ -175,8 +175,8 @@ class StopwatchWidget extends Widget {
     }
 });
 
-// Contagem regressiva com a duração das configurações. Clique inicia ou
-// pausa; clique direito zera.
+// Contagem regressiva com a duração das configurações. Clique direito inicia
+// ou pausa; clique do meio zera.
 export const TimerWidget = registerClass(
 class TimerWidget extends Widget {
     onMiddleClick() {

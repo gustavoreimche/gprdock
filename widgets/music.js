@@ -233,7 +233,7 @@ class MusicWidget extends Widget {
                 }
 
                 if (app) {
-                    app.activate();
+                    this.activateApp(app);
                 } else {
                     bus.call(player.name, MPRIS_PATH, ROOT_IFACE, 'Raise',
                         null, null, Gio.DBusCallFlags.NONE, -1, null, null);
