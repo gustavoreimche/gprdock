@@ -27,9 +27,13 @@ export default class GprDockExtension extends Extension {
         }
 
         const version = this._version();
+        // Cada enable tem seu número: se o GNOME desligar e religar antes de o
+        // código terminar de carregar, só a carga mais recente cria o dock.
+        // Sem isso, as duas cargas criavam um dock cada, e o primeiro ficava
+        // vivo sem nunca ser desligado (dois Profiles brigando pelos perfis).
+        const generation = this._generation = (this._generation ?? 0) + 1;
         this._import(version).then(module => {
-            // A extensão pode ter sido desligada enquanto o código carregava.
-            if (!this._enabled)
+            if (!this._enabled || generation !== this._generation)
                 return;
             this._app = new module.GprDock(this, version);
             this._app.enable();
